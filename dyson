@@ -1,0 +1,130 @@
+\documentclass{amsart}
+\usepackage[utf8]{inputenc}
+
+\title{Scribbled Notes}
+\author{Sagnik Ghosh}
+\date{September 17, 2020}
+
+
+\newtheorem{defn}[]{Definition}
+\newtheorem{obs}[]{Observation}
+\newtheorem{lem}[]{Lemma}
+\newtheorem{thm}[]{Theorem}
+\newtheorem{prop}[]{Proposition}
+\newtheorem{appr}[]{Approximation}
+
+\begin{document}
+
+\maketitle
+
+\section{Iterating the Dyson Equation}
+
+    We look at the retarded component of the Dyson Equation first. The structure for the advanced component is the same and the calculations for the Keldysh component is similar. The Retarded component is given by,
+
+    \begin{align}
+        D^R(t , t') = D_0^R(t, t') + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+     The idea is to evolve this to $D^R(t+\epsilon , t')$, and then use this iteratively to generate the dressed Green's Function. The Self Energy ($\Sigma$) and the bare Green's function ($D_0$) are known analytically, hence can be evaluated at any time points. Now,  
+     
+    \begin{align}\label{Dyson}
+        D^R(t+\epsilon , t') = D_0^R(t+\epsilon, t') + \int^{t+\epsilon}_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    And using the fact that the decomposition of Green's Functions for second order differential operators is given by,
+    \begin{align}
+        D(t_1 , t_3)=D(t_1 , t_2)\overline{D}(t_2 , t_3)+\overline{D}(t_1 , t_2)D(t_2 , t_3) \; (t_1>t_2>t_3)
+    \end{align}
+    
+    where the bar denotes total derivative w.r.t the first time index. 
+    Using this property, it can be shown that eq. (\ref{Dyson}) can be re-written as,
+    
+    \par 
+    \begin{multline}\label{DysonReduced}
+        D^R(t+\epsilon , t') = D_0(t+\epsilon , t)\overline{D}(t , t')+\overline{D_0}(t+\epsilon , t)D(t , t')
+        \\ + \int^{t+\epsilon}_{t} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{multline}
+        
+    We can now use a two-point Eulerian Quadrature, to restate the $t_1$ integral,
+    
+    \begin{multline}\label{Euler}
+        D^R(t+\epsilon , t') = D_0(t+\epsilon , t)\overline{D}(t , t')+\overline{D_0}(t+\epsilon , t)D(t , t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t+\epsilon)\int^{t+\epsilon}_{t'} dt_2 \Sigma^R (t+\epsilon,t_2) D^R(t_2, t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t)\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{multline}
+    
+    or,
+    
+    \begin{multline}\label{EulerIteration1}
+        D^R(t+\epsilon , t') = D_0(t+\epsilon , t)\overline{D}(t , t')+\overline{D_0}(t+\epsilon , t)D(t , t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t)\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{multline}
+    
+    as the second term drops off, the equal-time retarded Green's Function being zero. Eq (\ref{EulerIteration1}) expresses, the unknown quantity $D^R(t+\epsilon , t')$ in terms of known quantities evaluated at previous time steps and hence can be used to iteratively obtain $D^R$ at all times. Since it does not depend on $D^R(t+\epsilon , t')$, the iteration is not self-consistent.  
+    
+    The Equation can be further simplified by noticing that,
+    
+    \begin{align}
+        \overline{D}(t , t')=\frac{1}{\epsilon}\big(D(t , t')-D(t-\epsilon , t')\big)
+    \end{align}
+    
+    We define the integral in (\ref{EulerIteration1}) as,
+    
+    \begin{align}
+        I(t,t')=\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{align}
+    
+    Then using the linerity of integrals and another Eulerian Quadrature we obtain,  
+    
+    \begin{align}\label{EulerIteration2}
+        I(t,t')=I(t-\epsilon,t')+\frac{\epsilon}{2}\big[ \Sigma^R (t,t) D^R(t, t')+\Sigma^R (t,t-\epsilon) D^R(t-\epsilon, t')\big]  
+    \end{align}
+
+    This equation saves us a for loop. Using (\ref{EulerIteration1}),(\ref{EulerIteration2}), with the following boundary conditions we can obtain $D^R(t,t')$ for all $t$ and a given $t'$.
+    
+    \begin{align}\label{BoundaryCondition1}
+        I(t',t')=0; \; D^R(t',t')=0
+    \end{align}
+
+    The Pseudo Code is given by,
+    
+    \begin{verbatim}
+        Import Standard Module;
+        Import Math Module;
+        
+        Begin Program;
+        {
+        define real t, tprime;
+        define real a,b; 		%lower and upper bound on time
+        define real tone, ttwo, tthree;	%extra variables
+        define real h;			%gap in time, epsilon
+        
+        define real lambda;		%perturbation parameter
+        define real omega, k;		%omega
+        
+        
+        %Module for Euler For the retarded component
+        
+        DzeroR(t,tprime)= step(t-tprime)*(1/2*omega)sin(omega(t-tprime));
+        BarDzeroR(t,tprime)= step(t-tprime)*(1/2)cos(omega(t-tprime));
+        SE(t,tprime)=  lambda^2* GzeroK(t,t')(DzeroR(t,tprime)+DzeroA(t,tprime));
+        %as of now this formula is dummy
+        
+        Read value of a;
+        Read value of b;
+        Read value of h;
+        Read value of omega
+        Read value of lambda;
+        
+        For (tprime=a, tprime<=b, tprime=tprime+h)
+        	{Set I(a,tprime);
+        	Set DR(a,prime);
+        	For (t=a, t<=b, t=t+h)
+        		{I(t,tprime)=I(t-h,tprime)+h/2*SE(t,t-h)*D(t-h,tprime);
+        		 DR(t,tprime)=DzeroR(t,t-h)*1/h*[D(t-h,tprime)-D(t-h,tprime)]
+        		        +BarDzero(t,t-h)D(t-h,tprime)+h/2*Dzero(t,t-h)I(t-h,tprime); 
+        		 Return DR(t,tprime),I(t,tprime);
+        		}
+        	}
+    \end{verbatim}
+    
+\end{document}
