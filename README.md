@@ -1,0 +1,2 @@
+# Ph-eEquilibriation
+This repository contains the files and codes related to the phonon-electron equilibriation problem that I pursued as MS Thesis, at TIFR, Colaba with Dr Rajdeep Sensarma in the COViD affected Fall-2020, Spring-2021 semesters. We start with a lattice of coupled Electrons and Phonons (number not conserved), with some of the electrons initially excited to high energy states and study how it thermalises using Non-Equilibrium Field Theory. 
