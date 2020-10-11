@@ -1,9 +1,12 @@
 \documentclass{amsart}
 \usepackage[utf8]{inputenc}
 
+%\usepackage{natbib}
+%\bibliographystyle{abbrvnat}
+
 \title{Scribbled Notes}
 \author{Sagnik Ghosh}
-\date{September 17, 2020}
+\date{October 7, 2020}
 
 
 \newtheorem{defn}[]{Definition}
@@ -12,6 +15,7 @@
 \newtheorem{thm}[]{Theorem}
 \newtheorem{prop}[]{Proposition}
 \newtheorem{appr}[]{Approximation}
+
 
 \begin{document}
 
@@ -35,8 +39,7 @@
         D(t_1 , t_3)=D(t_1 , t_2)\overline{D}(t_2 , t_3)+\overline{D}(t_1 , t_2)D(t_2 , t_3) \; (t_1>t_2>t_3)
     \end{align}
     
-    where the bar denotes total derivative w.r.t the first time index. 
-    Using this property, it can be shown that eq. (\ref{Dyson}) can be re-written as,
+    where the bar denotes total derivative w.r.t the first time index eq. (\ref{Dyson}) can be re-written as,
     
     \par 
     \begin{multline}\label{DysonReduced}
@@ -79,7 +82,7 @@
         I(t,t')=I(t-\epsilon,t')+\frac{\epsilon}{2}\big[ \Sigma^R (t,t) D^R(t, t')+\Sigma^R (t,t-\epsilon) D^R(t-\epsilon, t')\big]  
     \end{align}
 
-    This equation saves us a for loop. Using (\ref{EulerIteration1}),(\ref{EulerIteration2}), with the following boundary conditions we can obtain $D^R(t,t')$ for all $t$ and a given $t'$.
+    This equation saves us a loop. Using (\ref{EulerIteration1}),(\ref{EulerIteration2}), with the following boundary conditions we can obtain $D^R(t,t')$ for all $t$ and a given $t'$.
     
     \begin{align}\label{BoundaryCondition1}
         I(t',t')=0; \; D^R(t',t')=0
@@ -126,5 +129,87 @@
         		}
         	}
     \end{verbatim}
+    
+\section{By-Parts By-Parts Everywhere}
+
+     As is evident in eq (\ref{Euler}), any quadrature that involves end-points will fail to give rise to a self-consistent iteration equation, if applied directly to the $t$ to $t+\epsilon$ integral, since $D^R(t+\epsilon,t+\epsilon)$ goes to zero. And any quadrature that involves mid-points, won't give rise to such terms, in the first place. Hence, construction of self-consistent iteration equation for the second order Green's Functions is slightly convoluted. We attempt to achieve it by applying by-parts to the third piece of eq (\ref{DysonReduced}). The integral can be written as,
+     
+     \begin{align}
+         \int^{t+\epsilon}_{t} dt_1 D_0^R(t+\epsilon, t_1)\int^{t_1}_{t'} dt_2  \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    Defining,
+    
+    \begin{align}
+              F(t_1,t') = \int^{t_1}_{t'} dt_2  \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    and treating $D_0^R$ as the first function we can expand the $t_1$ integral by-parts as,
+    
+        \begin{multline}\label{byparts1}
+            \Big[D_0^R(t+\epsilon, t_1)\int^{t_1}_{0}F(t_3,t')dt_3 \Big]^{t+\epsilon}_{t}-\int^{t+\epsilon}_t dt_1 \Big[\frac{d}{dt_1} D_0^R(t+\epsilon,t_1)\int^{t_1}_{t'} F(t_3,t')dt_3\Big]
+        \end{multline} 
+    
+    where the limit on the $t_3$ integral in the last term follows form the Fundamental theorem of Calculus. 
+    
+    \begin{thm}[First fundamental theorem of Calculus]
+        
+        Let f be a continuous real-valued function defined on a closed interval [a, b]. Let F be the function defined, for all x in [a, b], by
+            \begin{align*}
+              F ( x ) = \int_a^x f ( t ) d t   
+            \end{align*}
+        Then F is uniformly continuous on [a, b] and differentiable on the open interval (a, b), and
+            \begin{align*}
+                 F' ( x ) = f ( x )
+            \end{align*}
+        for all x in (a, b). 
+    \end{thm}
+    
+    Only one term survives from the boundary terms, as $D_0^R(t+\epsilon,t+\epsilon)$ goes to zero. And breaking the second integral with an Eulerian Quadrature we obtain,
+    
+        \begin{multline}\label{byparts2}
+            -D_0^R(t+\epsilon, t)\int^{t}_{0}F(t_3,t')dt_3 -\frac{\epsilon}{2} \Big[ \int^{t+\epsilon}_{t'} F(t_3,t')dt_3 \\+\frac{d}{dt} D_0^R(t+\epsilon,t)\int^{t}_{t'} F(t_3,t')dt_3\Big]
+        \end{multline} 
+        
+    Where the fundamental fact exploited is that $\frac{d}{dt}D_0^R(t+\epsilon,t)$ goes to 1 in the limit $t$ tends to equal times, as it behaves as $\theta$ function times cosine. Now the most straight forward way to obtain self consistency would have been to do a quadrature on the second  term.
+    
+        \begin{multline}\label{byparts3}
+            -D_0^R(t+\epsilon, t)\int^{t}_{0}F(t_3,t')dt_3 -\frac{\epsilon}{2} \Big[\frac{d}{dt} \Big(1+D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ -\frac{\epsilon^2}{4} \Big[ F(t+\epsilon,t')+F(t,t') \Big]
+        \end{multline} 
+    
+    Substituting for $F(t,t')$, 
+    
+        \begin{multline}\label{byparts4}
+            -D_0^R(t+\epsilon, t)\int^{t}_{0}F(t_3,t')dt_3 -\frac{\epsilon}{2} \Big[\frac{d}{dt} \Big(1+D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ -\frac{\epsilon^2}{4} 
+            \Big[ \int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2) D^R(t_2, t')
+            +\int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t') \Big]
+        \end{multline}
+        
+    and then doing by-parts on the penultimate terms treating $D^R$ as the first function we obtain,
+    
+    
+        \begin{multline}\label{byparts5}
+            -D_0^R(t+\epsilon, t)\int^{t}_{0}F(t_3,t')dt_3 -\frac{\epsilon}{2} \Big[\frac{d}{dt} \Big(1+D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ -\frac{\epsilon^2}{4} 
+            \Big[ \int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t')
+            \\+  D^R(t+\epsilon, t')\int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2) -\int^{t+\epsilon}_{t'} dt_2 \big[\frac{d}{dt_2} D^R(t_2 ,t')\int^{t_2}_{t'} F(t_3,t')dt_3\big]
+            \Big]
+        \end{multline}
+        
+    The lower limit of the first term goes to zero due to the causality structure of $D^R$. The upper limit gives the self consistent term. Yeet!
+    \par Putting everything together the Self-Consistent iteration equation becomes.   
+    
+    
+    
+        \begin{multline}\label{selfconsitentdyson1}
+            \mathbf{D^R(t+\epsilon , t')} = D_0(t+\epsilon , t)\overline{D}(t , t')+\overline{D_0}(t+\epsilon , t)D(t , t')
+        \\  -D_0^R(t+\epsilon, t)\int^{t}_{0}F(t_3,t')dt_3 -\frac{\epsilon}{2} \Big[\frac{d}{dt} \Big(1+D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ -\frac{\epsilon^2}{4} 
+            \Big[ \int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t')
+            -\int^{t+\epsilon}_{t'} dt_2 \big[\frac{d}{dt_2} D^R(t_2 ,t')\int^{t_2}_{t'} F(t_3,t')dt_3\big]
+            \\+  \mathbf{D^R(t+\epsilon, t')}\int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2)\Big]
+        \end{multline}
+        
+    The bad thing about eq(\ref{selfconsitentdyson1}) is that there are painful double integrals, which are costly for computation. But the good thing is they can be individually simplified using something similar to (\ref{EulerIteration1}) and then breaking the increment using quadrature.
+    We can not really use Euler everywhere, as Euler has second order error, and that will add up. We can use something like Simpson instead at some place, if necessary. But the basic idea remains the same.    
+    The pseudo-code is similar to the non self consistent case. The idea is to run a Newton-Rhapson at every step in place of the simple iteration, to find an implicit expression from \ref{selfconsitentdyson1}.
     
 \end{document}
