@@ -12,34 +12,93 @@ There are two modules written for the Retarded Component
 
 
 #include <stdio.h> 						/*Import Standard Module*/
-#include "math.h"							/*Import Math Module*/
+#include <math.h>							/*Import Math Module*/
+#include "green's.h"					/*Import Green's Functions and Baths*/
 
 float main() {
 
 /*Definitions*/
 
-	float t, tprime;						/*time parameters*/
-  float a,b; 									/*to be used for lower and upper bound on time*/
-  float tone, ttwo, tthree;		/*extra variables*/
-  float h;										/*gap in time, "the epsilon"*/
+		float t, tprime;						/*time parameters*/
+  	float a,b; 									/*to be used for lower and upper bound on time*/
+  	float tone, ttwo, tthree;		/*extra variables*/
+  	float h;										/*gap in time, "the epsilon"*/
 
-	int n;											/*array dimension*/
-	float omega, k;							/*omega, k; materials for dispersion relation*/
-	float lambda;								/*perturbation strenght parameter*/
+		int n;											/*array dimension*/
+		float omega, k;							/*omega, k; materials for dispersion relation*/
+		float lambda;								/*perturbation strenght parameter*/
 
 
 /*Working around the input function call*/
 
-	b=0;											/*Read value of a*/
-	a=10;											/*Read value of b*/
-	h=0.1;										/*Read value of h*/
-
-	omega=1;									/*Read value of omega*/
+	a= 0.0;										/*Read value of a*/
+	b= 10.0;									/*Read value of b*/
+	h= 0.1;										/*Read value of h*/
+	omega= 1;									/*Read value of omega*/
 	lambda=1;									/*Read value of lambda*/
 
-  n=(a-b)/h;								/*array Dimension*/
+  n=(b-a)/h;								/*array Dimension*/
 
-	printf("%d\n",n );
+/*	printf("the matrix dimension is:%d\n",n );        */
 
-return 0.0;
+  tprime = a;
+
+/*	printf("Value of time limits:%f\n",tprime ); */
+/*	printf("Check for known values of Green's Functions:%f\n", DR(1.00, 2.00,3.0123) ); */
+
+
+/*To Plot the input bare Green's Function and Bath*/
+
+/*
+	for ( t = a; t <= b ; t=t+h) {
+		printf("%f\t%f\n",t, DzeroR(omega,t,tprime) );
+	}
+*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Defining Iteration variables and outputs
+DR, BarDR and the integration I
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+float DR[n][n];
+float BarDR[n][n];
+float I[n][n];
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The Module for Dyson Iteration using Euler Method:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+/*Initial Condition*/
+
+I[0][0]=0;
+DR[0][0]=0;
+BarDR[0][0]= 0.5;
+
+DR[(int)(h/h)][0]= DzeroR(omega,h,0)*BarDR[0][0];
+I[(int)(h/h)][0]=0;
+
+
+float P; P=0.0;
+int i;
+
+	for (t=a+h; t<=b; t=t+h)
+	 {BarDR[(int)(t/h)][(int)(a/h)]=(DR[(int)(t/h)][(int)(a/h)]-DR[(int)((t-h)/h)][(int)(a/h)])/h;
+		DR[(int)((t+h)/h)][(int)(a/h)]= DzeroR(omega,t+h,h)*BarDR[(int)(t/h)][(int)(a/h)]+BarDzeroR(omega,t+h,h)*DR[(int)(t/h)][(int)(a/h)]+I[(int)(t/h)][(int)(a/h)];
+
+
+
+				for (i = (int)((a+h)/h); i <= (int)((t)/h); i++)
+				{
+					P=P+SigmaR(omega,t+h,(h*i))*DR[i][(int)(b/h)];
+				}
+		I[(int)((t+h)/h)][(int)(a/h)]=P;
+	}
+
+	/*To Plot the input bare Green's Function and Bath*/
+
+
+		for ( t = a; t <= b ; t=t+h) {
+			printf("%f\t%f\n",t, DR[(int)(t/h)][0] );
+		}
+
+
 }
