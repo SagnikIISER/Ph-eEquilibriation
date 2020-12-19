@@ -1,13 +1,11 @@
 
 /*CODE for SOLVING DYSON EQUATION
-
 First note down all the relevant formula plus diagram
 Only true unknown in the whole buisness is the D and BarD
 work out the equation for Keldysh Component
 There are two modules written for the Retarded Component
 			a. Euler
 			b. Self Consistent Field
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
@@ -37,7 +35,7 @@ float main() {
 	omega= 1;									/*Read value of omega*/
 	lambda=1;									/*Read value of lambda*/
 
-  n=(b-a)/h;								/*array Dimension*/
+  n=(b-a)/h+1;								/*array Dimension*/
 
 /*	printf("the matrix dimension is:%d\n",n );        */
 
@@ -54,7 +52,6 @@ float main() {
 	for ( t = a; t <= b ; t=t+h) {
 		printf("%f\t%f\n",t, DzeroR(omega,t,tprime) );
 	}
-
 	*/
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,23 +73,23 @@ I[0][0]=0;
 DR[0][0]=0;
 BarDR[0][0]= 1;
 
-DR[(int)(h/h)][0]= DzeroR(omega,h,0)*BarDR[0][0];
-I[(int)(h/h)][0]=0;
+DR[1][0]= DzeroR(omega,h,0)*BarDR[0][0];
+I[1][0]=0;
 
 
 float P; P=0.0;
 int i;
 
 	for (t=a+h; t<=b; t=t+h)
-	 {BarDR[(int)(t/h)][(int)(a/h)]=(DR[(int)(t/h)][(int)(a/h)]-DR[(int)((t-h)/h)][(int)(a/h)])/h;
-		DR[(int)((t+h)/h)][(int)(a/h)]= DzeroR(omega,t+h,t)*BarDR[(int)(t/h)][(int)(a/h)]+BarDzeroR(omega,t+h,t)*DR[(int)(t/h)][(int)(a/h)]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][(int)(a/h)];
+	 {BarDR[(int)(t/h)][0]=BarDzeroR(omega,t,t-h)*BarDR[(int)((t-h)/h)][0]-omega*omega*DzeroR(omega,t,t-h)*DR[(int)((t-h)/h)][0]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][0];
+		DR[(int)((t+h)/h)][0]= DzeroR(omega,t+h,t)*BarDR[(int)(t/h)][0]+BarDzeroR(omega,t+h,t)*DR[(int)(t/h)][0]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][0];
 
 
 				for (i = (int)((a+h)/h); i <= (int)((t)/h); i++)
 				{
-					P=P+h*SigmaR(omega,t+h,(h*i))*DR[i][(int)(a/h)];
+					P=P+h*SigmaR(omega,t+h,(h*i))*DR[i][0];
 				}
-		I[(int)((t+h)/h)][(int)(a/h)]=P;
+		I[(int)((t+h)/h)][0]=P;
 		P=0.0;
 	}
 
@@ -100,7 +97,7 @@ int i;
 
 
 		for ( t = a; t <= b ; t=t+h) {
-			printf("%f\t%f\n",t, DR[(int)(t/h)][(int)(a/h)] );
+			printf("%f\t%f\n",t, DR[(int)(t/h)][0] );
 		}
 
 
