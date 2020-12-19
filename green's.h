@@ -12,7 +12,7 @@
 
    		float D;
 
-   		D = (1/(2*omega))*sin(omega*(t-tprime));
+   		D = (1/(omega))*sin(omega*(t-tprime));
    		return D;
    	}
 
@@ -22,7 +22,7 @@
 
    		float D;
 
-   		D = (1/(2))*cos(omega*(t-tprime));
+   		D = cos(omega*(t-tprime));
    		return D;
    	}
 
@@ -31,6 +31,9 @@
    float SigmaR(float omega, float t, float tprime) {
 
        float D;
-       D = 0;
+       if (t==tprime) {
+         D = 1;
+       }
+       else {D=0;}
        return 0;
      }
