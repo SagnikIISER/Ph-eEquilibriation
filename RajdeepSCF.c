@@ -17,29 +17,29 @@ float main() {
 
 /*Definitions*/
 
-		float t, tprime;						/*time parameters*/
-  	float a,b; 									/*to be used for lower and upper bound on time*/
-  	float tone, ttwo, tthree;		/*extra variables*/
-  	float h;										/*gap in time, "the epsilon"*/
+	float t, tprime;							/*time parameters*/
+  	float a,b;								/*to be used for lower and upper bound on time*/
+  	float tone, ttwo, tthree;						/*extra variables*/
+  	float h;								/*gap in time, "the epsilon"*/
 
-		int n;											/*array dimension*/
-		float omega, k;							/*omega, k; materials for dispersion relation*/
-		float lambda;								/*perturbation strenght parameter*/
+	int n;									/*array dimension*/
+	float omega, k;								/*omega, k; materials for dispersion relation*/
+	float lambda;								/*perturbation strenght parameter*/
 
 
 /*Working around the input function call*/
 
-	a= 0.0;										/*Read value of a*/
-	b= 10;									/*Read value of b*/
-	h= 0.1;										/*Read value of h*/
-	omega= 1;									/*Read value of omega*/
-	lambda=1;									/*Read value of lambda*/
+	a= 0.0;									/*Read value of a*/
+	b= 10.0;								/*Read value of b*/
+	h= 0.1;									/*Read value of h*/
+	omega= 1;								/*Read value of omega*/
+	lambda=1;								/*Read value of lambda*/
 
-  n=(b-a)/h+1;								/*array Dimension*/
+	n=(b-a)/h+1;								/*array Dimension*/
 
 /*	printf("the matrix dimension is:%d\n",n );        */
 
-  tprime = a;
+  	tprime = a;
 
 /*	printf("Value of time limits:%f\n",tprime ); */
 /*	printf("Check for known values of Green's Functions:%f\n", DR(1.00, 2.00,3.0123) ); */
@@ -48,11 +48,10 @@ float main() {
 /*To Plot the input bare Green's Function and Bath*/
 
 
-	/*
-	for ( t = a; t <= b ; t=t+h) {
-		printf("%f\t%f\n",t, DzeroR(omega,t,tprime) );
-	}
-	*/
+/*
+		for ( t = a; t <= b ; t=t+h) 
+			{printf("%f\t%f\n",t, DzeroR(omega,t,tprime) );	}
+*/
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Defining Iteration variables and outputs
@@ -81,7 +80,7 @@ float P; P=0.0;
 int i;
 
 	for (t=a+h; t<=b; t=t+h)
-	 {BarDR[(int)(t/h)][0]=BarDzeroR(omega,t,t-h)*BarDR[(int)((t-h)/h)][0]-omega*omega*DzeroR(omega,t,t-h)*DR[(int)((t-h)/h)][0]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][0];
+	 {	BarDR[(int)(t/h)][0]=BarDzeroR(omega,t,t-h)*BarDR[(int)((t-h)/h)][0]-DzeroR(omega,t,t-h)*DR[(int)((t-h)/h)][0]+(h/2)*DzeroR(omega,t,t-h)*I[(int)((t-h)/h)][0];
 		DR[(int)((t+h)/h)][0]= DzeroR(omega,t+h,t)*BarDR[(int)(t/h)][0]+BarDzeroR(omega,t+h,t)*DR[(int)(t/h)][0]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][0];
 
 
@@ -91,7 +90,7 @@ int i;
 				}
 		I[(int)((t+h)/h)][0]=P;
 		P=0.0;
-	}
+	 }
 
 	/*To Plot the input bare Green's Function and Bath*/
 
