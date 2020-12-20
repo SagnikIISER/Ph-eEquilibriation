@@ -80,7 +80,7 @@ float P; P=0.0;
 int i;
 
 	for (t=a+h; t<=b; t=t+h)
-	 {	BarDR[(int)(t/h)][0]=BarDzeroR(omega,t,t-h)*BarDR[(int)((t-h)/h)][0]-DzeroR(omega,t,t-h)*DR[(int)((t-h)/h)][0]+(h/2)*DzeroR(omega,t,t-h)*I[(int)((t-h)/h)][0];
+	 {	BarDR[(int)(t/h)][0]=BarDzeroR(omega,t,t-h)*BarDR[(int)((t-h)/h)][0]-omega*omega*DzeroR(omega,t,t-h)*DR[(int)((t-h)/h)][0]+(h/2)*DzeroR(omega,t,t-h)*I[(int)((t-h)/h)][0];
 		DR[(int)((t+h)/h)][0]= DzeroR(omega,t+h,t)*BarDR[(int)(t/h)][0]+BarDzeroR(omega,t+h,t)*DR[(int)(t/h)][0]+(h/2)*DzeroR(omega,t+h,t)*I[(int)(t/h)][0];
 
 
