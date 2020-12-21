@@ -1,13 +1,14 @@
 \documentclass{amsart}
 \usepackage[utf8]{inputenc}
 
+\usepackage[dvipsnames]{xcolor}                 % Package for coloring texts
+\usepackage{amsmath}                            % For Maths 
 %\usepackage{natbib}
 %\bibliographystyle{abbrvnat}
 
 \title{Scribbled Notes}
 \author{Sagnik Ghosh}
-\date{October 7, 2020}
-
+\date{\\Created: September 14, 2020;\\ Last Updated: \today}
 
 \newtheorem{defn}[]{Definition}
 \newtheorem{obs}[]{Observation}
@@ -22,7 +23,48 @@
 \maketitle
 
 \section{Iterating the Dyson Equation}
-
+    We are interested in Phonons. So the theory in consideration is a second order interacting scalar field theory. The Self-Energy ($\Sigma$) has the same causality structure ($D^{-1}$). Hence the Bosonic Dyson Equation can be written in the Keldysh ($\phi^{cl},\phi^{q}$) basis (other indices are suppressed) as follows.
+    
+    \begin{align}
+        \begin{pmatrix}
+            D^K & D^R \\
+            D^A & 0
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            D_0^K & D_0^R \\
+            D_0^A & 0
+        \end{pmatrix} 
+        +\begin{pmatrix}
+            D_0^K & D_0^R \\
+            D_0^A & 0
+        \end{pmatrix} 
+        \circ\begin{pmatrix}
+            0 & \Sigma^A \\
+            \Sigma^R & \Sigma^K
+        \end{pmatrix}
+        \circ\begin{pmatrix}
+            D^K & D^R \\
+            D^A & 0
+        \end{pmatrix} 
+    \end{align}
+    
+    Here the $\circ$ denotes convolution over corresponding time indices. Component wise the equation can be decomposed into,
+    
+    \begin{align}\label{Retarded}
+        D^R(t , t') = D_0^R(t, t') + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    for the \textcolor{red}{retarded} part and,
+    
+    \begin{multline}\label{Keldysh}
+        D^K(t , t') = D_0^R(t, t')  + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^K(t_2, t') \\
+                                    + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^K (t_1,t_2) D^A(t_2, t') 
+    \end{multline}
+   
+   \par for the \textcolor{red}{Keldysh} part. The contribution in eq. (\ref{Keldysh}) from the term $D_0^K\circ \Sigma_0^A\circ D^A$ vanishes due to the vanishing renormalization on $D_0^K$.
+    
+    
     We look at the retarded component of the Dyson Equation first. The structure for the advanced component is the same and the calculations for the Keldysh component is similar. The Retarded component is given by,
 
     \begin{align}
