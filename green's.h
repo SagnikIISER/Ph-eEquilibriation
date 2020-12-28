@@ -26,14 +26,62 @@
    		return D;
    	}
 
-   /*Function call for SigmaR*/
 
-   float SigmaR(float omega, float t, float tprime) {
 
-       float D;
-       if (t==tprime) {
-         D = 1;
-       }
-       else {D=0;}
-       return 0;
-     }
+
+    /*Function call for DzeroK*/
+
+     float DzeroK(float omega, float t, float tprime) {
+
+     		float D;
+
+     		D = (1/(omega))*sin(omega*(t-tprime));
+     		return D;
+     	}
+
+   /*Function call for BarDzeroR*/
+
+     float BarDzeroK(float omega, float t, float tprime) {
+
+     		float D;
+
+     		D = cos(omega*(t-tprime));
+     		return D;
+     	}
+
+
+    /*Function call for SigmaR*/
+
+    float SigmaR(float omega, float t, float tprime) {
+
+          float D;
+          if (t==tprime) {
+            D = 1;
+          }
+          else {D=0;}
+          return 0;
+          }
+
+    /*Function call for SigmaA*/
+
+    float SigmaA(float omega, float t, float tprime) {
+
+          float D;
+          if (t==tprime) {
+            D = 1;
+          }
+          else {D=0;}
+          return 0;
+          }
+
+    /*Function call for SigmaK*/
+
+    float SigmaK(float omega, float t, float tprime) {
+
+          float D;
+          if (t==tprime) {
+            D = 1;
+          }
+          else {D=0;}
+          return 0;
+          }
