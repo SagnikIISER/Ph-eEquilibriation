@@ -10,22 +10,21 @@
 
    /*Function call for DzeroR*/
 
-   float DzeroR(float omega, float t, float tprime) {
-
-   		float D;
-   		D = (1/(omega))*sin(omega*(t-tprime));
-   		return D;
+    float complex DzeroR(float omega, float t, float tprime) {
+        float complex D;
+   		  D = (1/omega)*sin(omega*(t-tprime));
+   		  return D;
    	}
 
 
 
    /*Function call for BarDzeroR*/
 
-   float BarDzeroR(float omega, float t, float tprime) {
+     float complex BarDzeroR(float omega, float t, float tprime) {
 
-   		float D;
-   		D = cos(omega*(t-tprime));
-   		return D;
+   		  float complex D;
+   		  D = cos(omega*(t-tprime));
+   		  return D;
    	}
 
 
@@ -33,48 +32,36 @@
 
     /*Function call for DzeroK*/
 
-     float DzeroK(float omega, float t, float tprime) {
+     float complex DzeroK(float omega, float t, float tprime) {
 
-     		float D;
-
-        if (t==tprime) {
-        	D = (1/tanh((omega+25)/(2*100)));
-        }
-        if (t>tprime) {
-        	D = (1/omega)*(1/tanh(omega+25/(2*100)))*sin(omega*(t-tprime));
-        }
-        if (t<tprime) {
-          D = -(1/omega)*(1/tanh(omega+25/(2*100)))*sin(omega*(t-tprime));
-        }
-
-     		return D;
+     		float complex D;
+        float Tsyst;
+        Tsyst=100;
+        	D = (1/tanh((omega)/(2*Tsyst)));
+        	return D;
      	}
 
 
 
     /*Function call for SigmaR*/
 
-    float SigmaR(float omega, float t, float tprime) {
+     float complex SigmaR(float omega, float t, float tprime) {
 
-          float D;
-          D = (1/(2*10))*Bessel(2*10*(t-tprime))/(t-tprime);
-          return D;
-          }
+              float complex D;
+              float sigma;
+              sigma = 8.0;
+              D = 2*omega*Dawson(omega/(sqrt(2)*sigma))/sqrt(3.14159265)-I*omega*exp(-(omega*omega)/(sigma*sigma));
+              return D;
+              }
 
     /*Function call for SigmaK*/
 
-    float SigmaK(float omega, float t, float tprime) {
+    float complex SigmaK(float omega, float t, float tprime) {
 
-
-      float  P, Q, tbath, w;
-      P=0.0;
-      tbath=10;
-
-        for (w = (-2*tbath); w < (2*tbath); w=w+0.1) {
-        Q=(1-(w*w/(4*tbath*tbath)));
-        P=P+(0.1)*(2/tbath)*sqrt(Q)*(sin((w)*(t-tprime)))*tanh((w+25)/(2*25));
-      }
-
-      return P;
-
-      }
+             float complex D;
+             float sigma, Tbath;
+             sigma = 8.0;
+             Tbath = 10;
+             D = -2*I*omega*exp(-(omega*omega)/(sigma*sigma))/tanh((omega/(2*Tbath)));
+             return D;
+             }
