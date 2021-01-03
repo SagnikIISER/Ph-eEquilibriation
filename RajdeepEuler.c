@@ -10,6 +10,7 @@ There are two modules written for the Retarded Component
 
 
 #include <stdio.h> 						/*Import Standard Module*/
+#include <stdlib.h> 						/*Import Standard Module*/
 #include <math.h>							/*Import Math Module*/
 #include <complex.h>          /*Import Modules for Complex Numbers*/
 #include "Dawson.h"
@@ -36,16 +37,16 @@ float main() {
 /*Working around the input function call*/
 
 	a= 0.0;										  /*Read value of a*/
-	b= 10.0;										/*Read value of b*/
+	b= 30.0;										/*Read value of b*/
 	h= 0.1;									   	/*Read value of h*/
 
 	lambda=1;									  /*Read value of lambda*/
 
   n=(b-a)/h+1;							    /*array Dimension*/
-	ktot=5;									  /*array Dimension*/
+	ktot=25;									  /*array Dimension*/
 
 	A=1;										    /*Read value of Lattice Constant*/
-  k=1;											  /*Dummy Array for momentum*/
+  k=5;											  /*Dummy Array for momentum*/
 
   tprime = a;
 
@@ -64,9 +65,14 @@ float complex IR[n][n];
 float complex DA[n][n];
 
 
-float complex DK[n];
-float	complex DUMMY[n][n];
-float complex IK[n][n];
+float complex DK[n][n];
+float	complex DUMMY1[n][n];
+float	complex DUMMY2[n][n];
+float	complex DUMMY3[n][n];
+float complex IK1[n][n];
+float complex IK2[n][n];
+float complex IK3[n][n];
+
 
 float N[n];
 
@@ -76,7 +82,7 @@ The Module for Dyson Iteration using Euler Method:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-for (k=0; k<ktot; k=k+1){
+//for (k=0; k<ktot; k=k+1){
 
 /*Momentum values at Dummy Indicies*/
 K=((-3.1418/A)+k*(6.2836/A)/(ktot-1));
@@ -103,12 +109,19 @@ DR[(int)(t/h)][(int)(t/h)]=0;
 BarDR[(int)(t/h)][(int)(t/h)]= 1;
 
 
-IK[(int)(t/h)][(int)(t/h)]=0;
-DUMMY[(int)(t/h)][(int)(t/h)]=0;
+IK1[(int)(t/h)][(int)(t/h)]=0;
+IK2[(int)(t/h)][(int)(t/h)]=0;
+IK3[(int)(t/h)][(int)(t/h)]=0;
+DUMMY1[(int)(t/h)][(int)(t/h)]=0;
+DUMMY2[(int)(t/h)][(int)(t/h)]=0;
+DUMMY3[(int)(t/h)][(int)(t/h)]=0;
 
 
 DR[(int)((t+h)/h)][(int)(t/h)]= DzeroR(omega,t+h,t)*I*BarDR[(int)(t/h)][(int)(t/h)];
 IR[(int)((t+h)/h)][(int)(t/h)]=0;
+IK1[(int)((t+h)/h)][(int)(t/h)]=0;
+IK2[(int)((t+h)/h)][(int)(t/h)]=0;
+IK3[(int)((t+h)/h)][(int)(t/h)]=0;
 
 }
 
@@ -117,7 +130,6 @@ IR[(int)((t+h)/h)][(int)(t/h)]=0;
 
 float complex P;
 P=0.0;
-
 int i;
 
 
@@ -129,7 +141,7 @@ int i;
 
 				for (i = (int)((tprime+h)/h); i <= (int)((t)/h); i++)
 				{
-					P=P+h*SigmaR(omega,t+h,(h*i))*DR[i][(int)(tprime/h)];
+					P=P+h*lambda*lambda*SigmaR(t+h,(h*i))*DR[i][(int)(tprime/h)];
 				}
 		IR[(int)((t+h)/h)][(int)(tprime/h)]=P;
 		P=0.0;
@@ -140,50 +152,109 @@ int i;
 /*The Advanced Part*/
 
 for (tprime=a; tprime<=b; tprime=tprime+h){
-for (t=tprime+h; t<=b; t=t+h){
-		DA[(int)((tprime)/h)][(int)(t/h)]=conjf(DR[(int)((t)/h)][(int)(tprime/h)]);
+for (t=a; t<=b; t=t+h){
+		DA[(int)((tprime)/h)][(int)(t/h)]=conjf(DR[(int)(t/h)][(int)(tprime/h)]);
 }
 }
 
+
+/*%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&*/
 /*The Keldysh Part*/
+/*%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&*/
+
+
+/*RKA*/
 
 P=0.0;
 
-for ( ttwo = a; ttwo <=(b-h) ; ttwo=ttwo+h) {
-for ( tone = a; tone <=(b-h) ; tone=tone+h) {
+for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+for ( tone = a; tone <=b ; tone=tone+h) {
 
-	for (i = 0; i <= (int)((ttwo-h)/h); i++)
+	for (i = (int)((a+h)/h); i <= (int)((ttwo-h)/h); i++)
 		{
-			P=P+h*SigmaK(omega,tone,(h*i))*DA[i][(int)(ttwo/h)];
+			P=P+h*lambda*lambda*SigmaK(tone,(h*i))*DA[i][(int)(ttwo/h)];
 		}
-	DUMMY[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+	DUMMY1[(int)((tone)/h)][(int)((ttwo)/h)]=P;
 	P=0.0;
 		}
 	}
 
-for ( ttwo = a; ttwo <=(b-h) ; ttwo=ttwo+h) {
-for ( tone = a; tone <=(b-h) ; tone=tone+h) {
+for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+for ( tone = a; tone <=b ; tone=tone+h) {
 
 	for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
 		{
-			P=P+h*DR[(int)(tone/h)][i]*DUMMY[i][(int)(ttwo/h)];
+			P=P+h*DzeroR(omega, tone, (h*i))*DUMMY1[i][(int)(ttwo/h)];
 		}
-	IK[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+	IK1[(int)((tone)/h)][(int)((ttwo)/h)]=P;
 	P=0.0;
 		}
 		}
-for ( t = a; t <=(b-h) ; t=t+h) {
-DK[(int)((t)/h)]= DzeroK(omega,t,t)+IK[(int)((t)/h)][(int)((t)/h)];
+
+
+/*KAA*/
+
+	P=0.0;
+
+	for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+	for ( tone = a; tone <=b ; tone=tone+h) {
+
+	for (i = (int)((tone+h)/h); i <= (int)((ttwo-h)/h); i++)
+		{
+			P=P+h*lambda*lambda*SigmaA(tone,(h*i))*DA[i][(int)(ttwo/h)];
 		}
+	DUMMY2[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+	P=0.0;
+		}
+		}
+
+	for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+	for ( tone = a; tone <=b ; tone=tone+h) {
+
+	for (i = (int)((a+h)/h); i <= (int)((ttwo-h)/h); i++)
+		{
+			P=P+h*DzeroK(omega,tone,(h*i))*DUMMY2[i][(int)(ttwo/h)];
+		}
+	IK2[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+	P=0.0;
+		}
+		}
+
+
+/*RRK*/
+						for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+						for ( tone = a; tone <=b ; tone=tone+h) {
+
+							for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
+								{
+									P=P+h*lambda*lambda*SigmaR(tone,(h*i))*DK[i][(int)(ttwo/h)];
+								}
+							DUMMY3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+							P=0.0;
+
+							for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
+								{
+									P=P+h*DzeroR(omega,tone,(h*i))*DUMMY3[i][(int)(ttwo/h)];
+								}
+							IK3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+							P=0.0;
+
+							DK[(int)((tone)/h)][(int)((ttwo)/h)]=DzeroK(omega,tone,ttwo)+IK1[(int)((tone)/h)][(int)((ttwo)/h)]+IK2[(int)((tone)/h)][(int)((ttwo)/h)]+IK3[(int)((tone)/h)][(int)((ttwo)/h)];
+											}
+											}
+
+
+
+
 
 
 /*The Occupation Number*/
-/*
+
 		for (t=a; t<=b; t=t+h){
-		N[k][(int)((t)/h)]=0.5*(DK[k][(int)((t)/h)][(int)((t)/h)]-1);
+		N[(int)((t)/h)]=0.5*(2*omega*-cimagf(DK[(int)(t/h)][(int)(t/h)])-1);
 		}
 
-}
+
 
 /*The Statistics*/
 /*
@@ -235,13 +306,13 @@ NPr=0.0;
 			 printf("%f\t%f\n", t, DK[0][(int)((t)/h)][(int)((t)/h)] );
 		 }
 */
-}
+
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 K loop ends here.
 Put K independent printf statements after this.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-for (t = a; t < b; t=t+h){
-printf("%f\t%f\n", t ,crealf(DK[(int)(t/h)]) ) ;
+for (t = a; t < (b-h); t=t+h){
+printf("%f\t%f\n", t , N[(int)((t)/h)] ) ;
 }
 }
