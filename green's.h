@@ -61,7 +61,7 @@
      		float complex D;
         float Tsyst;
         Tsyst= 0.5;
-        	D = -(I/2*omega)*((cos((-omega*(t-tprime)))/(tanh((omega)/(2*Tsyst)))));//-I*(1/(2*omega))*(1+exp(-(omega/Tsyst))*(cos(omega*(t-tprime))+I*sin(omega*(t-tprime))))
+        	D = -(I/(2*omega))*((cos((-omega*(t-tprime)))/(tanh((omega)/(2*Tsyst)))));//-I*(1/(2*omega))*(1+exp(-(omega/Tsyst))*(cos(omega*(t-tprime))+I*sin(omega*(t-tprime))))
         	return D;
      	}
 
@@ -139,7 +139,7 @@
                                  h=0.1;
                                  P=0.0;
                                  sigma = 1.0;
-                                 Tbath = 2.0;
+                                 Tbath = 0.9;
 
                                  for(akka=-5; akka <= 5; akka=akka+h){
                                  P = P+ h*(-2*I*akka*exp(-(akka*akka)/(sigma*sigma)))*(1/tanh((akka/(2*Tbath))))*(cos(akka*(t-tprime))-I*sin(akka*(t-tprime)));
