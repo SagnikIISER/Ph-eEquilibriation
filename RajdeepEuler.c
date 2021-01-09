@@ -1,20 +1,21 @@
 
-/*CODE for SOLVING DYSON EQUATION
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+CODE for SOLVING DYSON EQUATION
+
 First note down all the relevant formula plus diagram
 Only true unknown in the whole buisness is the D and BarD
-work out the equation for Keldysh Component
-There are two modules written for the Retarded Component
+There are two modules written for the Retarded and Keldysh Component:
 			a. Euler
 			b. Self Consistent Field
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-#include <stdio.h> 						/*Import Standard Module*/
-#include <stdlib.h> 						/*Import Standard Module*/
-#include <math.h>							/*Import Math Module*/
-#include <complex.h>          /*Import Modules for Complex Numbers*/
-#include "Dawson.h"
-#include "green's.h"				  /*Import Green's Functions and Baths*/
+#include <stdio.h> 		/*Import Standard Module*/
+#include <stdlib.h> 		/*Import Standard Library*/
+#include <math.h>		/*Import Math Module*/
+#include <complex.h>          	/*Import Modules for Complex Numbers*/
+#include "Dawson.h"		/*Import Module for Dawson Function*/
+#include "green's.h"		/*Import Green's Functions and Baths*/
 
 
 
@@ -22,33 +23,33 @@ float main() {
 
 /*Definitions*/
 
-		float t, tprime;					/*time parameters*/
-  	float a,b; 								/*to be used for lower and upper bound on time*/
+	float t, tprime;		/*time parameters*/
+  	float a,b; 			/*to be used for lower and upper bound on time*/
   	float tone, ttwo, tthree;	/*extra variables*/
-  	float h;									/*gap in time, "the epsilon"*/
+  	float h;			/*gap in time, "the epsilon"*/
 
-		float A;									/*Lattice Constant*/
-		int 	n, k, ktot;					/*array dimension*/
-		float K;									/*Momentum formula*/
-  	float omega;							/*omega, k; materials for dispersion relation*/
-		float lambda;							/*perturbation strenght parameter*/
+	float A;			/*Lattice Constant*/
+	int   n, k, ktot;		/*array dimension*/
+	float K;			/*Momentum formula*/
+  	float omega;			/*omega, k; materials for dispersion relation*/
+	float lambda;			/*perturbation strenght parameter*/
 
 
 /*Working around the input function call*/
 
-	a= 0.0;										  /*Read value of a*/
-	b= 30.0;										/*Read value of b*/
-	h= 0.1;									   	/*Read value of h*/
+	a= 0.0;				/*Read value of a*/
+	b= 30.0;			/*Read value of b*/
+	h= 0.1;				/*Read value of h*/
 
-	lambda=1;									  /*Read value of lambda*/
+	lambda=1;			/*Read value of lambda*/
 
-  n=(b-a)/h+1;							    /*array Dimension*/
-	ktot=25;									  /*array Dimension*/
+ 	n=(b-a)/h+1;    		/*array Dimension*/
+	ktot=25;			/*array Dimension*/
 
-	A=1;										    /*Read value of Lattice Constant*/
-  k=5;											  /*Dummy Array for momentum*/
+	A=1;				/*Read value of Lattice Constant*/
+        k=5     			/*Dummy Array for momentum*/
 
-  tprime = a;
+  	tprime = a;
 
 
 
@@ -84,19 +85,28 @@ The Module for Dyson Iteration using Euler Method:
 
 //for (k=0; k<ktot; k=k+1){
 
-/*Momentum values at Dummy Indicies*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Momentum values at Dummy Indicies
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
 K=((-3.1418/A)+k*(6.2836/A)/(ktot-1));
 
-/*Dispersion Relation*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+System Dispersion Relation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
 omega=2*sqrt(sin((K*A/2))*sin((K*A/2)));
 
-/*To Plot the Dispersion Relation*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ To Plot the Dispersion Relation
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
 //	printf("%f\t%f\n", K, omega );
 
 
 
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 /*Initial Condition*/
 
@@ -158,12 +168,13 @@ for (t=a; t<=b; t=t+h){
 }
 
 
-/*%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*The Keldysh Part*/
-/*%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-/*RKA*/
+/*The convolution RKA*/
+
 
 P=0.0;
 
@@ -192,7 +203,7 @@ for ( tone = a; tone <=b ; tone=tone+h) {
 		}
 
 
-/*KAA*/
+/* The convolution KAA*/
 
 	P=0.0;
 
@@ -221,27 +232,30 @@ for ( tone = a; tone <=b ; tone=tone+h) {
 		}
 
 
-/*RRK*/
-						for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
-						for ( tone = a; tone <=b ; tone=tone+h) {
+/*The convolution RRK
+  and the updated Keldysh Component*/
 
-							for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
-								{
-									P=P+h*lambda*lambda*SigmaR(tone,(h*i))*DK[i][(int)(ttwo/h)];
-								}
-							DUMMY3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
-							P=0.0;
+	for ( ttwo = a; ttwo <=b ; ttwo=ttwo+h) {
+	for ( tone = a; tone <=b ; tone=tone+h) {
 
-							for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
-								{
-									P=P+h*DzeroR(omega,tone,(h*i))*DUMMY3[i][(int)(ttwo/h)];
-								}
-							IK3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
-							P=0.0;
+		for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
+			{
+			P=P+h*lambda*lambda*SigmaR(tone,(h*i))*DK[i][(int)(ttwo/h)];
+			}
+			DUMMY3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+			P=0.0;
 
-							DK[(int)((tone)/h)][(int)((ttwo)/h)]=DzeroK(omega,tone,ttwo)+IK1[(int)((tone)/h)][(int)((ttwo)/h)]+IK2[(int)((tone)/h)][(int)((ttwo)/h)]+IK3[(int)((tone)/h)][(int)((ttwo)/h)];
-											}
-											}
+		for (i = (int)((a+h)/h); i <= (int)((tone-h)/h); i++)
+			{
+			P=P+h*DzeroR(omega,tone,(h*i))*DUMMY3[i][(int)(ttwo/h)];
+			}
+
+		  IK3[(int)((tone)/h)][(int)((ttwo)/h)]=P;
+			P=0.0;
+
+			DK[(int)((tone)/h)][(int)((ttwo)/h)]=DzeroK(omega,tone,ttwo)+IK1[(int)((tone)/h)][(int)((ttwo)/h)]+IK2[(int)((tone)/h)][(int)((ttwo)/h)]+IK3[(int)((tone)/h)][(int)((ttwo)/h)];
+		}
+		}
 
 
 
@@ -249,9 +263,9 @@ for ( tone = a; tone <=b ; tone=tone+h) {
 
 
 /*The Occupation Number*/
-
+/*
 		for (t=a; t<=b; t=t+h){
-		N[(int)((t)/h)]=0.5*(2*omega*-cimagf(DK[(int)(t/h)][(int)(t/h)])-1);
+		N[(int)((t)/h)]=0.5*(-2*omega*cimagf(DK[(int)(t/h)][(int)(t/h)])-1);
 		}
 
 
@@ -313,6 +327,6 @@ Put K independent printf statements after this.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 for (t = a; t < (b-h); t=t+h){
-printf("%f\t%f\n", t , N[(int)((t)/h)] ) ;
+printf("%f\t%f\n", t , -(2*omega)*cimagf(DK[(int)((t)/h)][(int)((t)/h)])) ;
 }
 }
