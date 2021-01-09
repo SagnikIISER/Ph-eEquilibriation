@@ -13,7 +13,8 @@ There are various physical questions of interest. For e.g. how does the temperat
 We wish to study some of these with the Swinger-Keldysh formulation of non-equilibrium field theory. The idea is to solve for the time dependant interacting Greens functions from the Dyson Equation and obtain the time dependence of various quantities from them, which can then be used to address various aforementioned questions we have set out to delve in.
 
 ## Files
-  1. **DysonIteration.tex**: The .tex for Scribbled Notes. Contains the derivation for algorithim and pseudocodes for iterating the Dyson Equation for the Bosonic Sector by Euler method and Self-Consistently.
+  1. **DysonIteration.tex**: The Tex file for Scribbled Notes. Contains the derivation for algorithim and pseudocodes for iterating the Dyson Equation for the Bosonic Sector by Euler method and Self-Consistently.
   2. **RajdeepEuler.c**: The code for iterating Dyson Equation by Euler Method.
   3. **RajdeepSCF.c**: The code for iterating Dyson Equation by Self Consistent Method.
   4. **green's.h**: Header file containing the function call for Self Energies, Bare Green's Function and Baths.
+  5. **Dawson.h**: Header file for computing Dawson function required for test run using Ohmic-Bath
