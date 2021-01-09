@@ -1,0 +1,387 @@
+\documentclass{amsart}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}   
+
+\usepackage[a4paper,margin=30mm]{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\usepackage[dvipsnames]{xcolor}                 
+
+
+%\usepackage{natbib}
+%\bibliographystyle{abbrvnat}
+
+\title{Scribbled Notes}
+\author{Sagnik Ghosh}
+\date{\\Created: September 14, 2020;\\ Last Updated: \today}
+
+\newtheorem{defn}[]{Definition}
+\newtheorem{obs}[]{Observation}
+\newtheorem{lem}[]{Lemma}
+\newtheorem{thm}[]{Theorem}
+\newtheorem{prop}[]{Proposition}
+\newtheorem{appr}[]{Approximation}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Iterating the Dyson Equation}
+    We are interested in Phonons. So the theory in consideration is a second order interacting scalar field theory. The Self-Energy ($\Sigma$) has the same causality structure ($D^{-1}$). Hence the Bosonic Dyson Equation can be written in the Keldysh ($\phi^{cl},\phi^{q}$) basis (other indices are suppressed) as follows.
+    
+    \begin{align}
+        \begin{pmatrix}
+            D^K & D^R \\
+            D^A & 0
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            D_0^K & D_0^R \\
+            D_0^A & 0
+        \end{pmatrix} 
+        +\begin{pmatrix}
+            D_0^K & D_0^R \\
+            D_0^A & 0
+        \end{pmatrix} 
+        \circ\begin{pmatrix}
+            0 & \Sigma^A \\
+            \Sigma^R & \Sigma^K
+        \end{pmatrix}
+        \circ\begin{pmatrix}
+            D^K & D^R \\
+            D^A & 0
+        \end{pmatrix} 
+    \end{align}
+    
+    Here the $\circ$ denotes convolution over corresponding time indices. Component wise the equation can be decomposed into,
+    
+    \begin{align}\label{Retarded}
+        D^R(t , t') = D_0^R(t, t') + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    for the \textcolor{red}{Retarded} part and,
+    
+    \begin{multline}\label{Keldysh}
+        D^K(t , t') = \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^K (t_1,t_2) D^A(t_2, t') \\
+                                    +  \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^K(t_2, t')
+    \end{multline}
+   
+   \par for the \textcolor{red}{Keldysh} part. The contribution in eq. (\ref{Keldysh}) from the unperturbed term and $D_0^K\circ \Sigma_0^A\circ D^A$ vanishes due to the vanishing renormalization on $D_0^K$. 
+    
+    
+    We look at the retarded component of the Dyson Equation first. The structure for the advanced component is the same and the calculations for the Keldysh component is similar. The Retarded component is given by,
+
+    \begin{align}
+        D^R(t , t') = D_0^R(t, t') + \int^t_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+     The idea is to evolve this to $D^R(t+\epsilon , t')$, and then use this iteratively to generate the dressed Green's Function. The Self Energy ($\Sigma$) and the bare Green's function ($D_0$) are known analytically, hence can be evaluated at any time points. Now,  
+     
+    \begin{align}\label{Dyson}
+        D^R(t+\epsilon , t') = D_0^R(t+\epsilon, t') + \int^{t+\epsilon}_{t'} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    And using the fact that the decomposition of Green's Functions for second order differential operators is given by,
+    \begin{align}
+        D(t_1 , t_3)=D(t_1 , t_2)\overline{D}(t_2 , t_3)+\overline{D}(t_1 , t_2)D(t_2 , t_3) \; (t_1>t_2>t_3)
+    \end{align}
+    
+    where the bar denotes total derivative w.r.t the first time index, eq. (\ref{Dyson}) can be re-written as,
+    
+    \par 
+    \begin{multline}\label{DysonReduced}
+        D^R(t+\epsilon , t') = D^R_0(t+\epsilon , t)\overline{D^R}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^R(t , t')
+        \\ + \int^{t+\epsilon}_{t} dt_1\int^{t_1}_{t'} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{multline}
+        
+    We can now use a two-point Eulerian Quadrature, to restate the $t_1$ integral,
+    
+    \begin{multline}\label{Euler}
+        D^R(t+\epsilon , t') = D_0^R(t+\epsilon , t)\overline{D^R}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^R(t , t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t+\epsilon)\int^{t+\epsilon}_{t'} dt_2 \Sigma^R (t+\epsilon,t_2) D^R(t_2, t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t)\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{multline}
+    
+    or,
+    
+    \begin{multline}\label{EulerIteration1}
+        D^R(t+\epsilon , t') = D^R_0(t+\epsilon , t) {\overline{D^R}(t , t')}+\overline{D^R_0}(t+\epsilon , t)D^R(t , t')
+        \\ + \frac{\epsilon}{2} D_0^R(t+\epsilon, t)\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{multline}
+    
+    as the second term drops off, the equal-time retarded Green's Function being zero. Eq (\ref{EulerIteration1}) expresses, the unknown quantity $D^R(t+\epsilon , t')$ in terms of known quantities evaluated at previous time steps and hence can be used to iteratively obtain $D^R$ at all times. Since it does not depend on $D^R(t+\epsilon , t')$, the iteration is not self-consistent.  
+    
+     {The iteration equation for $\overline{D^R}$ can be obtained by taking derivative w.r.t the first time index of the both sides of eq. (\ref{EulerIteration1}) (at the previous time step)\footnote{ {Since this is a greens function to a second order differential equation, time evolving it in the forward direction requires two independent iteration equation for $D^R$ and $\overline{D^R}$. In the previous version we had considered a back ward difference type formula for $\overline{D^R}$. That does not work!}},}
+    
+    \begin{multline}\label{EulerIteration2}
+        \overline{D^R}(t , t') = \overline{D^R_0}(t , t-\epsilon)\overline{D^R}(t-\epsilon , t')+\overline{\overline{D^R_0}}(t , t-\epsilon)D^R(t-\epsilon , t')
+         \\  + \frac{\epsilon}{2} \overline{D_0^R}(t, t-\epsilon)\int^{t-\epsilon}_{t'} dt_2 \Sigma^R (t-\epsilon,t_2) D^R(t_2, t')
+    \end{multline}
+    
+     The quantity $\overline{\overline{D^R_0}}$ is analytical in nature and in our case simply $-\omega_k^2D^R_0$.
+    We define the integral in (\ref{EulerIteration1}) as,
+    
+    \begin{align}
+        I(t,t')=\int^{t}_{t'} dt_2 \Sigma^R (t,t_2) D^R(t_2, t')
+    \end{align}
+    
+     This can be broken down using an Eulerian quadrature    
+    \footnote{We note that, this equation can be further simplified to save one loop if the $\Sigma$ is homogeneous in time. But that is not the case in general.} at each time step.
+    
+    \begin{multline}\label{EulerIteration3}
+         I^R(t,t')=\epsilon\big[\Sigma^R (t,t-\epsilon) D^R(t-\epsilon, t')\big]+\Sigma^R (t,t-2\epsilon) D^R(t-2\epsilon, t')\big]+\cdots
+        \\  +\Sigma^R (t,t'+\epsilon) D^R(t'+\epsilon, t')\big]
+    \end{multline}
+    
+     The boundary terms in the quadrature vanishes due to the causality structure of $D^R$ and $\Sigma^R$ respectively.
+ Using (\ref{EulerIteration1}),(\ref{EulerIteration2}) and (\ref{EulerIteration3}), with the following boundary conditions,
+    
+    \begin{align}\label{BoundaryCondition1}
+        I(0,0)=0; \;\;\; D^R(0,0)=0; \;\;\; \overline{D^R}(0,0')=1
+    \end{align}
+    
+    we can obtain $D^R(t,t')$ for all $t$ and a given $t'$. 
+    
+    
+    The Pseudo Code is given by,
+    \par
+    \begin{verbatim}
+        Import Standard Module;
+        Import Math Module;
+        
+        Begin Program;
+        {
+        define real t, tprime;
+        define real a,b; 		%lower and upper bound on time
+        define real tone, ttwo, tthree;	%extra variables
+        define real h;			%gap in time, epsilon
+        
+        define real lambda;		%perturbation parameter
+        define real omega, k;		%omega
+        
+        
+        %Module for Euler For the retarded component
+        
+        DzeroR(t,tprime)= step(t-tprime)*(1/omega)sin(omega(t-tprime));
+        BarDzeroR(t,tprime)= step(t-tprime)cos(omega(t-tprime));
+        SER(t,tprime)=SERbath(t,tprime));
+        
+        Read value of a;
+        Read value of b;
+        Read value of h;
+        Read value of omega
+        Read value of lambda;
+        
+        Define Array D;
+        Define Array BarD;
+        
+        For (tprime=a, tprime<=b, tprime=tprime+h)
+        	{Set I(a,tprime);
+        	Set DR(a,tprime);
+        	For (t=a+h, t<=b, t=t+h)
+        		{BarDR(t,tprime)=BarDzeroR(t,t-h)*BarDR(t-h,tprime)
+        		        -omega*omega*DzeroR(t,t-h)D(t-h,tprime)+h/2*BarDzeroR(t,t-h)I(t-h,tprime);
+        		DR(t+h,tprime)=DzeroR(t+h,t)*BarDR(t,tprime)
+        		        +BarDzeroR(t+h,t)D(t,tprime)+h/2*DzeroR(t+h,t)I(t,tprime); 
+        		I(t,tprime)=Sum_i {h*SER(t,t-i)*DR(t-i,tprime)};
+                Return DR(t,tprime);}
+        		}
+        	}
+    \end{verbatim}
+    
+    The \textcolor{Red}{Advanced} component is obtained as the Harmitian conjugate of $D^R$ in the time domain, which can be used for further calculations. Similar to eq. (\ref{DysonReduced}, the calculation for the \textcolor{Red}{Keldysh} component reduces to,
+
+    \begin{multline}\label{DysonKeldyshReduced}
+         D^K(t+\epsilon , t') = D^R_0(t+\epsilon , t)\overline{D^K}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^K(t , t')
+                         \\  + \int^{t+\epsilon}_{t} dt_1\int^{t_1}_{0} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^K(t_2, t')
+                         \\  + \int^{t+\epsilon}_{t} dt_1\int^{t'}_{0} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^K (t_1,t_2) D^A(t_2, t')
+    \end{multline}
+    
+     The limits on the integral comes from the causality structures of various $\Sigma$, $D^0$, and $D$. For the $D_0^R\circ \Sigma_0^R\circ D^K$ convolution we have $t>t_1>t_2$. $D^K$ does not have a particular causality structure, but the $\Sigma$ by definition has $\theta(t_1)\theta(t_2)$ sturcture to it (in other words it interaction is turned on at $t=0$), setting the lower limit of the integrals to 0. Similarly the convolution $D_0^R\circ \Sigma_0^K\circ D^A$, poses the following restrictions, $t>t1 , t_2<t'$ with $t_1,t_2$ are unordered with respect to each other.
+    
+     Similar to eq. (\ref{EulerIteration1}) after an Euler Quadrature on the integrals we obtain,
+    
+    \begin{multline}\label{KeldyshEulerIteration1}
+         D^K(t+\epsilon , t') = D^R_0(t+\epsilon , t)\overline{D^K}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^K(t , t')
+        \\  + \frac{\epsilon}{2} D_0^R(t+\epsilon, t)\Big[\int^{t}_{0} dt_2 \Sigma^R (t,t_2) D^K(t_2, t') + \int^{t'}_{0} dt_2 \Sigma^K (t,t_2) D^A(t_2, t')\Big]
+    \end{multline}
+    
+     The iteration equation for $\overline{D^K}$ is obtained as,
+    
+    
+    \begin{multline}\label{KeldyshEulerIteration2}
+         \overline{D^K}(t , t') = \overline{D^R_0}(t , t-\epsilon)\overline{D^K}(t-\epsilon , t')+\overline{\overline{D^R_0}}(t , t-\epsilon)D^K(t-\epsilon , t')
+        \\  + \frac{\epsilon}{2} \overline{D_0^R}(t, t-\epsilon)\Big[\int^{t-\epsilon}_{0} dt_2 \Sigma^R (t-\epsilon,t_2) D^K(t_2, t') + \int^{t'}_{0} dt_2 \Sigma^K (t-\epsilon,t_2) D^A(t_2, t')\Big]
+    \end{multline}
+    
+     The integrals can be expressed again as quadrature,
+    
+    \begin{multline}\label{KeldyshEulerIteration3}
+         I^K(t,t')= \epsilon\Big[\frac{1}{2}\Sigma^R (t,0) D^K(0, t')+\Sigma^R (t,\epsilon) D^K(\epsilon, t')+\cdots+\Sigma^R (t,t-\epsilon) D^K(t-\epsilon, t')\Big] 
+        \\ +\epsilon\Big[\frac{1}{2}\Sigma^K (t,0) D^A(0, t')+\Sigma^K (t,\epsilon) D^A(\epsilon, t')+\cdots+\Sigma^K (t,t'-\epsilon) D^A(t'-\epsilon, t')\Big]
+    \end{multline}
+    
+    The boundary conditions are
+    
+    \begin{align}\label{BoundaryCondition2}
+         I^K(0,0)=0; \;\;\; D^K(0,0)=0; \;\;\; \overline{D^K}(0,0)=0
+    \end{align}
+    
+    The pseudocode,
+    
+    \begin{verbatim}
+        Define Array DK;
+        Define Array BarDK;
+        
+        For (tprime=a, tprime<=b, tprime=tprime+h)
+        	{Set I(a,tprime);
+        	Set DK(a,tprime);
+        	For (t=a+h, t<=b, t=t+h)
+        		{BarDR(t,tprime)=BarDzeroR(t,t-h)*BarDK(t-h,tprime)
+        		    -omega*omega*DzeroR(t,t-h)D(t-h,tprime)+h/2*BarDzeroK(t,t-h)I(t-h,tprime);
+        		DR(t+h,tprime)=DzeroR(t+h,t)*BarDK(t,tprime)
+        		        +BarDzeroR(t+h,t)D(t,tprime)+h/2*DzeroK(t+h,t)I(t,tprime); 
+        		I(t,tprime)=(h/2)*{SER(t,0)*DK(0,tprime)+SEK(t,0)*DA(0,tprime)}
+        		     +h*Sum_i {SER(t,t-i)*DK(t-i,tprime)+SEK(t,tprime-i)*DA(tprime-i,tprime)};
+                Return DK(t,tprime);}
+        		}
+    \end{verbatim}
+    
+    That concludes the iteration by Euler Method.
+\section{By-Parts By-Parts Everywhere}
+
+     As is evident in eq (\ref{Euler}), any quadrature that involves end-points will fail to give rise to a self-consistent iteration equation, if applied directly to the $t$ to $t+\epsilon$ integral, since $D^R(t+\epsilon,t+\epsilon)$ goes to zero. And any quadrature that involves mid-points, won't give rise to such terms, in the first place. Hence, construction of self-consistent iteration equation for the second order Green's Functions is slightly convoluted. We attempt to achieve it by applying by-parts to the third piece of eq (\ref{DysonReduced}). The integral can be written as,
+     
+     \begin{align}
+         \int^{t+\epsilon}_{t} dt_1 D_0^R(t+\epsilon, t_1)\int^{t_1}_{t'} dt_2  \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    Defining,
+    
+    \begin{align}
+              F(t_1,t') = \int^{t_1}_{t'} dt_2  \Sigma^R (t_1,t_2) D^R(t_2, t')
+    \end{align}
+    
+    and treating $D_0^R$ as the first function we can expand the $t_1$ integral by-parts as,
+    
+        \begin{multline}\label{byparts1}
+            \Big[D_0^R(t+\epsilon, t_1)\int^{t_1}_{t'}F(t_3,t')dt_3 \Big]^{t+\epsilon}_{t}-\int^{t+\epsilon}_t dt_1 \Big[\frac{d}{dt_1} D_0^R(t+\epsilon,t_1)\int^{t_1}_{t'} F(t_3,t')dt_3\Big]
+        \end{multline} 
+    
+    where the limit on the $t_3$ integral in the last term follows form the Fundamental theorem of Calculus. 
+    
+    \begin{thm}[First fundamental theorem of Calculus]
+        
+        Let f be a continuous real-valued function defined on a closed interval [a, b]. Let F be the function defined, for all x in [a, b], by
+            \begin{align*}
+              F ( x ) = \int_a^x f ( t ) d t   
+            \end{align*}
+        Then F is uniformly continuous on [a, b] and differentiable on the open interval (a, b), and
+            \begin{align*}
+                 F' ( x ) = f ( x )
+            \end{align*}
+        for all x in (a, b). 
+    \end{thm}
+    
+     Among the boundary terms only one term survives, as $D_0^R(t+\epsilon,t+\epsilon)$ goes to zero. And breaking the second integral with an Eulerian Quadrature we obtain,
+    
+        \begin{multline}\label{byparts2}
+            -D_0^R(t+\epsilon, t)\int^{t}_{t'}F(t_3,t')dt_3 +\frac{\epsilon}{2} \Big[ \int^{t+\epsilon}_{t'} F(t_3,t')dt_3 \\-\frac{d}{dt} D_0^R(t+\epsilon,t)\int^{t}_{t'} F(t_3,t')dt_3\Big]
+        \end{multline} 
+        
+    Where the fundamental fact exploited is that $\frac{d}{dt}D_0^R(t+\epsilon,t)$ goes to -1 in the limit $t$ tends to equal times, as it behaves as $\theta$ function times cosine. Now the most straight forward way to obtain self consistency would have been to do a quadrature on the second  term.
+    
+        \begin{multline}\label{byparts3}
+            -D_0^R(t+\epsilon, t)\int^{t}_{t'}F(t_3,t')dt_3 +\frac{\epsilon}{2} \Big[ \Big(1-\frac{d}{dt}D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ +\frac{\epsilon^2}{4} \Big[ F(t+\epsilon,t')+F(t,t') \Big]
+        \end{multline} 
+    
+    Substituting for $F(t,t')$, 
+    
+        \begin{multline}\label{byparts4}
+            -D_0^R(t+\epsilon, t)\int^{t}_{t'}F(t_3,t')dt_3 +\frac{\epsilon}{2} \Big[ \Big(1-\frac{d}{dt}D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 ]\\ +\frac{\epsilon^2}{4} 
+            \Big[ \int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2) D^R(t_2, t')
+            +\int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t') \Big]
+        \end{multline}
+        
+    and then doing by-parts on the penultimate terms treating $D^R$ as the first function we obtain,
+    
+    
+        \begin{multline}\label{byparts5}
+            -D_0^R(t+\epsilon, t)\int^{t}_{t'}F(t_3,t')dt_3 +\frac{\epsilon}{2} \Big[ \Big(1-\frac{d}{dt}D_0^R(t+\epsilon,t)\Big)\int^{t}_{t'} F(t_3,t')dt_3 \Big]\\ +\frac{\epsilon^2}{4} 
+            \Big[ \int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t') 
+            \\+  D^R(t+\epsilon, t')\int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2) -\int^{t+\epsilon}_{t'} dt_2 \big[\frac{d}{dt_2} D^R(t_2 ,t')\int^{t_2}_{t'} \Sigma^R(t+\epsilon,t_3)dt_3\big]
+            \Big]
+        \end{multline}
+        
+    The lower limit of the first term goes to zero due to the causality structure of $D^R$. The upper limit gives the self consistent term. Yeet!
+    \par Putting everything together the Self-Consistent iteration equation becomes.   
+    
+    
+    
+        \begin{multline}\label{selfconsitentdyson1}
+             {\mathbf{D^R(t+\epsilon , t')} = D^R_0(t+\epsilon , t)\overline{D^R}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^R(t , t')}
+                        \\  {-D_0^R(t+\epsilon, t)\int^{t}_{t'}F(t_3,t')dt_3 +\frac{\epsilon}{2} \Big[ \Big(1+\overline{D_0^R}(t,t+\epsilon)\Big)\int^{t}_{t'} F(t_3,t')dt_3 \Big]}\\  {+\frac{\epsilon^2}{4} 
+                        \Big[ \int^{t}_{t'} dt_2  \Sigma^R (t,t_2) D^R(t_2, t') -\int^{t+\epsilon}_{t'} dt_2  \overline{D^R}(t_2 ,t')\int^{t_2}_{t'} \Sigma^R(t+\epsilon,t_3)dt_3}
+                        \\ {+ \mathbf{D^R(t+\epsilon , t')}\int^{t+\epsilon}_{t'} dt_2  \Sigma^R (t+\epsilon,t_2) \Big]}
+        \end{multline}
+        
+         {Now, we define}
+        
+        \begin{align}
+            & {I^R_1(t,t')=\int^{t}_{t'} dt_1  \Sigma^R (t+\epsilon,t_1)}\\
+            & {I^R_2(t,t')=\int^{t}_{t'}F(t_1,t')dt_1=\int^{t}_{t'}dt_1\int^{t_1}_{t'} dt_2  \Sigma^R (t_1,t_2) D^R(t_2, t')}
+        \end{align}
+        
+         {In terms of that the self consistent Dyson Equation simplifies to,}
+        
+        \begin{multline}\label{selfconsitentdyson2}
+             {\mathbf{D^R(t+\epsilon , t')} = \Bigg(D^R_0(t+\epsilon , t)\overline{D^R}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^R(t , t')}
+                        \\  {-D_0^R(t+\epsilon, t)I^R_2(t,t') +\frac{\epsilon}{2} \Big[ \Big(1+\overline{D_0^R}(t,t+\epsilon)\Big)I^R_2(t,t') \Big]}\\  {+\frac{\epsilon^2}{4} 
+                        \Big[ F(t,t') -\int^{t+\epsilon}_{t'} dt_2  \overline{D^R}(t_2 ,t')I^R_1(t_2,t')\Big]\Bigg)\Big/\Bigg(1-\frac{\epsilon^2}{4}I^R_1(t+\epsilon,t')\Bigg)}
+        \end{multline}
+        
+    The bad thing about eq. (\ref{selfconsitentdyson1}) is that there are painful double integrals, which are costly for computation. But the good thing is they can be individually simplified using something similar to (\ref{EulerIteration1}) and then breaking the increment using quadrature.
+    We can not really use Euler everywhere, as Euler has second order error, and that will add up. We can use something like Simpson instead at some place, if necessary. But the basic idea remains the same.    
+    The pseudo-code is similar to the non self consistent case.
+    
+    
+     {The method for deriving the self-consistent iteration equation for \textcolor{Red}{Keldysh} component is similar but care needs to be taken regarding the limits and the non-zero boundary terms. We quote eq (\ref{DysonKeldyshReduced}),}
+    
+    
+    \begin{multline}
+         D^K(t+\epsilon , t') = D^R_0(t+\epsilon , t)\overline{D^K}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^K(t , t')
+                         \\  + \int^{t+\epsilon}_{t} dt_1\int^{t_1}_{0} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^R (t_1,t_2) D^K(t_2, t')
+                         \\  + \int^{t+\epsilon}_{t} dt_1\int^{t'}_{0} dt_2 D_0^R(t+\epsilon, t_1) \Sigma^K (t_1,t_2) D^A(t_2, t')
+    \end{multline}
+    
+      The self-consistent part arises from the $D_0^R\circ \Sigma_0^R\circ D^K$ convolution, which has similar causality stuructre as $D_0^R\circ \Sigma_0^R\circ D^R$, except the lower limit for $t_2$ integral is pushed to zero. The $D_0^R\circ \Sigma_0^K\circ D^A$ convolution can be simply treated like a quadrature as before. We define,
+     
+       
+        \begin{align}
+            & I^K_1(t,t')=\int^{t}_{0} dt_1  \Sigma^R (t+\epsilon,t_1)\\
+            & I^K_2(t,t')=\int^{t}_{0}F^K(t_1,t')dt_1=\int^{t}_{0}dt_1\int^{t_1}_{0} dt_2  \Sigma^R (t_1,t_2) D^K(t_2, t')\\
+            & I^K_3(t,t')=\epsilon\Big[\frac{1}{2}\Sigma^K (t,0) D^A(0, t')+\Sigma^K (t,\epsilon) D^A(\epsilon, t')+\cdots+\Sigma^K (t,t'-\epsilon) D^A(t'-\epsilon, t')\Big]\\
+            & F^K(t_1,t')=\int^{t_1}_{0} dt_2  \Sigma^R (t_1,t_2) D^K(t_2, t')
+        \end{align}
+        
+     In terms of these, the self-consistent equation becomes,
+    
+    \begin{multline}\label{selfconsitentKeldyshdyson2}
+             \mathbf{D^K(t+\epsilon , t')} = \Bigg(D^R_0(t+\epsilon , t)\overline{D^K}(t , t')+\overline{D^R_0}(t+\epsilon , t)D^K(t , t')
+                        \\  -D_0^R(t+\epsilon, t)I^K_2(t,t') +\frac{\epsilon}{2} \Big[D_0^R(t+\epsilon, t)I^K_3(t,t') + \Big(1+\overline{D_0^R}(t,t+\epsilon)\Big)I^K_2(t,t') \Big]
+                        \\  +\frac{\epsilon^2}{4} 
+                        \Big[ F^K(t,t') -\int^{t+\epsilon}_{t'} dt_2  \overline{D^K}(t_2 ,t')I^K_1(t_2,t')\Big]\Bigg)\Big/\Bigg(1-\frac{\epsilon^2}{4}I^K_1(t+\epsilon,t')\Bigg)
+        \end{multline}
+        
+     Note, the boundary terms in the last by-parts proportional to $D^K(0,t')$ drops out as the coefficient integral has zero width. The evolution equation for $\overline{D^K(t,t')}$ can be obtained by taking a derivative w.r.t the first time index. As it is evident from the structure of $D^K$, this will just give rise to $\overline{D_0^R}$ and $\overline{\overline{D_0^R}}$, both of which are analytically known.
+    
+    Our next task is to test this setting for various $\Sigma(t,t').$ We have the following checks.
+    A. For a trivial $\Sigma(t,t').$ the iterations should reproduce the corresponding bare Green's functions
+    B. For a Bath $\Sigma(t,t')$ the population distribution for phonons should ideally thermalise.
+    
+    We also wish to test the methods against each other and see if the self-consistent method actually improves upon the results significantly.
+    
+    More later!! :D
+    
+    \end{document}
