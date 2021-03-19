@@ -12,6 +12,7 @@ There are two modules written for the Retarded and Keldysh Component:
 
 #include <stdio.h> 		/*Import Standard Module*/
 #include <stdlib.h> 		/*Import Standard Library*/
+#include <omp.h>
 #include <math.h>		/*Import Math Module*/
 #include <complex.h>          	/*Import Modules for Complex Numbers*/
 #include "Dawson.h"		/*Import Module for Dawson Function*/
@@ -23,21 +24,20 @@ Defining Iteration variables and outputs
 DR, BarDR and the integration I
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-double complex DR[2000][2000];
-double complex BarDR[2000][2000];
-double complex IR[2000][2000];
+double complex DR[2510][2510];
+double complex BarDR[2510][2510];
+double complex IR[2510][2510];
 
-double complex DA[2000][2000];
+double complex SigK[2510][2510];
+double complex DA[2510][2510];
 
-double complex DK[2000][2000];
-double complex BarDK[2000][2000];
+double complex DK[2510][2510];
+double complex BarDK[2510][2510];
 double complex DKthermal;
-double complex DKthermal2;
 
-double complex IK1[2000][2000];
-double complex IK2[2000][2000];
+double complex IK1[2510][2510];
+double complex IK2[2510][2510];
 
-double N[2000];
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
@@ -54,7 +54,7 @@ double tone, ttwo;				/*extra variables*/
 double h;					/*gap in time, "the epsilon"*/
 
 double A;					/*Lattice Constant*/
-int   n, klevel, ktot;				/*Array Dimension*/
+int    n, klevel, ktot;				/*Array Dimension*/
 double K;					/*Momentum Formula*/
 double omega;					/*Initial Energy Level*/
 double lambda;					/*Perturbation Strength*/
@@ -62,27 +62,32 @@ double lambda;					/*Perturbation Strength*/
 double sigma, Tbath, Tsyst;
 
 
+double complex partial_Sum, total_Sum;
+double akka;
+double complex P;
+
 
 /*Working around the input variable calls*/
 
   a= 0.000000;					/*Read value of a*/
-  b= 15.000000;					/*Read value of b*/
+  b= 250.000000;				 /*Read value of b*/
   h= 0.100000;					/*Read value of h*/
 
-  lambda=2.00000;					/*Read value of lambda*/
-
-  n=(int)((b-a)/h)+1;			    		/*array Dimension*/
-  ktot= 35;					/*array Dimension*/
+  lambda=0.50000;				/*Read value of lambda*/
+  n=(int)((b-a)/h)+1;			    	/*array Dimension*/
+  ktot= 19;					/*array Dimension*/
 
   A=1;						/*Read value of Lattice Constant*/
-  klevel=5; 			    			/*Dummy Array for momentum*/
+  klevel=1; 			    		/*Dummy Array for momentum*/
 
-  sigma=2.500000;
+  sigma=5.000000;
   Tsyst=1.000000;
+  Tbath=0.800000;
 
 int i;
 int j;
 int k;
+int l;
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,33 +120,49 @@ System Dispersion Relation
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Computing the DK thermal
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
-float akka;
-float complex P;
-
 /*
-for (Tbath=0.1 ; Tbath <= 10 ;  Tbath= Tbath+h) {
+
+
 
 P=0.0;
 
 for(akka=-100; akka <= 100; akka=akka+h){
-P = P + h*(-lambda*lambda*akka*exp(-(akka*akka/(sigma*sigma))))/((2.0*akka*akka-2.0*omega*omega-lambda*lambda*(sigma/sqrt(3.14159265))+lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))*(2.0*akka*akka-2.0*omega*omega-lambda*lambda*(sigma/sqrt(3.14159265))+lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))+(lambda*lambda*lambda*lambda*akka*akka*exp(-2.0*(akka*akka/(sigma*sigma)))))*(1.0/tanh((akka/(2.0*Tbath))));
+P = P + h*(lambda*lambda*akka*exp(-(akka*akka/(sigma*sigma))))/((2.0*akka*akka-2.0*omega*omega+lambda*lambda*(sigma/sqrt(3.14159265))-lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))*(2.0*akka*akka-2.0*omega*omega+lambda*lambda*(sigma/sqrt(3.14159265))-lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))+(lambda*lambda*lambda*lambda*akka*akka*exp(-2.0*(akka*akka/(sigma*sigma)))))*(1.0/tanh((akka/(2.0*Tbath))));
 }
+
 DKthermal = P/(3.14159265);
 
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Assigning Sigma K
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+	for (i=0; i<n; i++){
+    SigK[i][0]=SigmaK(i*h,0);
+  }
+
+  for (i=0; i<n; i++){
+    SigK[0][i]=SigmaK(0,i*h);
+  }
+
+  for (j=1; j<n; j++){
+    for (i=j; i<n; i++){
+        SigK[i][j]=SigK[i-j][0];
+    }
+  }
 
 
-printf("%f\t%f\n", Tbath, -crealf(DKthermal));
-
-
-}
+  for (j=1; j<n; j++){
+    for (i=j; i<n; i++){
+        SigK[j][i]=SigK[0][i-j];
+    }
+  }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Initial Condition
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-/*Initial Condition*/
+
 
 for (i=0; i<n; i++){
 
@@ -155,7 +176,7 @@ DK[i][i]=-(I/(2.0*omega))*(1.0/(tanh((omega)/(2*Tsyst))));
 BarDK[i][i]= 0;
 
 DR[i+1][i]= -2.0*DzeroR(omega,t+h,t)*BarDR[i][i];
-//IR[i+1][i]= -(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DR[i+1][i];
+IR[i+1][i]= +1.0/(2.0*sqrt(3.14159265))*lambda*lambda*sigma*DR[i+1][i];
 
 
 DK[i+1][i]= -2.0*BarDzeroR(omega,(h*i)+h,(h*i))*DK[i][i];
@@ -164,33 +185,34 @@ DK[i][i+1]=-conjf(DK[i+1][i]);
 
 IK1[i][i]=0;
 IK2[i][i]=0;
-//IK1[i+1][i]=(h/2.0)*lambda*lambda*SigmaR(t+h,t)*DK[i][i]-(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][i];
-//IK2[i+1][i]=(h/2.0)*lambda*lambda*SigmaK(t+h,t+h)*DR[i][(int)(t+h/h)];
+IK1[i+1][i]=(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][i];
+IK2[i+1][i]=(h/2.0)*lambda*lambda*SigK[i+1][i+1]*DR[i+1][i];
 }
+
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The Retarded Part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-P=0.0;
-
-int l;
-
-	for (j=0; j<n; j++){
-	for (i=j+1; i<n; i++){
-	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*IR[i-1][j];
-	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*IR[i][j];
 
 
-				for (l = j+1; l < i; l++)
-				{
-					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DR[l][j];
-				}
+    	for (j=0; j<n; j++){
+    	for (i=j+1; i<n; i++){
+    	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*IR[i-1][j];
+    	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*IR[i][j];
 
-		IR[i+1][j]=P+(1.0/(sqrt(3.14159265)))*lambda*lambda*sigma*DR[i+1][j];
-		P=0.0;
-	}
-	}
+    				for (l = j+1; l < i; l++)
+    				{
+    					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DR[l][j];
+    				}
+
+    		IR[i+1][j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
+    		P=0.0;
+    	}
+    	}
+
+
+
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,23 +237,40 @@ for (i=0; i<n ; i++){
 	  BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(IK1[i-1][j]+IK2[i-1][j]);
 		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IK1[i][j]+IK2[i][j]);
 
-
 				for (l = 1; l <= i; l++)
 				{
 					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DK[l][j];
 				}
 
-		IK1[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
+		IK1[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
 		P=0.0;
 
+
+        //#pragma omp parallel private(partial_Sum) shared(total_Sum)
+        //{
+
+              partial_Sum = 0;
+              total_Sum = 0;
+
+        //#pragma omp for
 
 						for (l = 1; l < j; l++)
 						{
-							P=P+h*lambda*lambda*SigmaK((i*h)+h,(h*l))*DA[l][j];
+							partial_Sum = partial_Sum+h*lambda*lambda*SigK[i+1][l]*DA[l][j];
 						}
 
-		IK2[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaK((i*h)+h,(i*h)+h)*DA[i+1][j];
-		P=0.0;
+
+            //Create thread safe region.
+            //#pragma omp critical
+            //{
+                    //add each threads partial sum to the total sum
+                    total_Sum = partial_Sum;
+            //}
+            IK2[i+1][j]=total_Sum+(h/2.0)*lambda*lambda*SigK[i+1][i+1]*DA[i+1][j];
+
+            //}
+            partial_Sum = 0;
+            total_Sum = 0;
 
 		DK[j][i+1]=-conjf(DK[i+1][j]);
 		BarDK[j][i]=conjf(BarDK[i][j]);
@@ -254,8 +293,8 @@ for (i=0; i<n ; i++){
 
 /*The Statistics*/
 /*
-float VarE[n], EE[n], E[n], Ntot[n];-2*omega*Dawson(omega/(sqrt(2)*sigma))/sqrt(3.14159265)
-float EEPr, EPr, NPr;
+double VarE[n], EE[n], E[n], Ntot[n];-2*omega*Dawson(omega/(sqrt(2)*sigma))/sqrt(3.14159265)
+double EEPr, EPr, NPr;
 
 EPr=0.0;
 EEPr=0.0;
@@ -307,7 +346,7 @@ NPr=0.0;
 K loop ends here.
 Put K independent printf statements after this.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-//printf("\n%f\t%f", omega, crealf(DKthermal))  ;
+//printf("\n%f\n%f\n%f", omega, crealf(DKthermal), -cimagf(DK[n][n])-crealf(DKthermal));
 
 
 for (i = 0; i < n; i++){
