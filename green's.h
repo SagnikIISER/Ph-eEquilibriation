@@ -1,18 +1,23 @@
 /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   Definition for function calls
+   Definition for Function Calls
    for all Analytical Green's functions
    in Phononic and Electronic Sectors,
-   Baths and Self Energies
-
+   Baths and Self Energies for Test Module
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
 
-   /*Function call for DzeroR*/
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Phononic Bare Green's Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-    float complex DzeroR (float omega, float t, float tprime)
+/****************************
+   Function call for DzeroR
+****************************/
+
+    double complex DzeroR (double omega, double t, double tprime)
         {
-        float complex D;
+        double complex D;
         if (t<tprime)
         {
             D=0;
@@ -26,11 +31,13 @@
    	}
 
 
-   /*Function call for BarDzeroR*/
+/*******************************
+   Function call for BarDzeroR
+*******************************/
 
-     float complex BarDzeroR(float omega, float t, float tprime)
+     double complex BarDzeroR(double omega, double t, double tprime)
         {
-        float complex D;
+        double complex D;
         if (t<tprime)
         {
            D=0;
@@ -43,93 +50,102 @@
        }
 
 
-    /*Function call for DzeroK*/
+/*******************************
+    Function call for DzeroK
+ ******************************/
 
-     float complex DzeroK(float omega, float Tsyst, float t, float tprime) {
+     double complex DzeroK(double omega, double Tsyst, double t, double tprime) {
 
-     		float complex D;
+     		double complex D;
         	D = -(I/(2.0*omega))*((cos((omega*(t-tprime)))/(tanh(omega/(2.0*Tsyst)))));
         	return D;
      	}
 
 
 
-     /*Function call for DzeroK*/
 
-      float complex BarDzeroK(float omega, float Tsyst, float t, float tprime) {
+/*******************************
+   Function call for BarDzeroK
+********************************/
 
-          float complex D;
+
+      double complex BarDzeroK(double omega, double Tsyst, double t, double tprime) {
+
+          double complex D;
           D = (I/2.0)*((sin((omega*(t-tprime)))/(tanh((omega)/(2*Tsyst)))));
           return D;
       }
 
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Function Call For Self Energies
+for the Test Module
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-    /*Function call for SigmaR*/
 
-     float complex SigmaR( float t, float tprime)
+
+/*******************************
+   Function call for SigmaR
+********************************/
+
+     double complex SigmaR( double t, double tprime)
      {
 
-              float complex D;
-              float sigma;
+              double complex D;
+              double sigma;
 
-              sigma = 5.0;
+              sigma = 10.0;
 
               if (t<tprime) {
                   D=0;
-              }
          		  else{
                 D= -(1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(t-tprime)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
               }
 
-         		  return D;
+              return D;
          	}
 
+        }
 
-      /*Function call for SigmaPR*/
-/*
-               float complex SigmaPR( float t, float tprime) {
+/*********************************
+   Function call for SigmaRP
+*********************************/
 
-
-                        float complex D,P;
-                        float sigma;
-                        float akka;
-                        float h;
-
-                        h=0.1;
-                        P=0.0;
-                        sigma = 5.0;
-
-                        if (t<tprime) {
-                            D=0;
-                        }
-                   		  else{
-                          /*for(akka=-5; akka <= 5; akka=akka+h){
-                          P = P+ h*(1/(2*3.14159265))*(2*akka*Dawson(akka/(sqrt(2)*sigma))/sqrt(3.14159265)+I*akka*exp(-(akka*akka)/(sigma*sigma)))*(cos(akka*(t-tprime))+I*sin(akka*(t-tprime)));
-                          }
-                          D = P;
-                          P = 0.0;
-                          D= (1/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(1.0-2.0*sigma*sigma*(t-tprime)*(t-tprime))*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
-                        }
-
-                   		  return D;
-                   	}
-*/
-
-    /*Function call for SigmaK*/
-
-    float complex SigmaK( float t, float tprime) {
+    double complex SigmaRP( double t, double tprime) {
 
 
-                                 float complex D,P;
-                                 float sigma,Tbath;
-                                 float akka;
-                                 float h;
+             double complex D;
+             double sigma;
 
-                                 h=0.1;
+             sigma = 10.0;
+
+             if (t<tprime) {
+             D=0;
+             }
+        		  else{
+                D = (1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(sigma*sigma*(t-tprime)*(t-tprime)/2.0-1.0)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
+            }
+
+            return D;
+        }
+
+
+/*********************************
+   Function call for SigmaK
+*********************************/
+
+    double complex SigmaK( double t, double tprime) {
+
+
+                                 double complex D,P;
+                                 double sigma,Tbath;
+                                 double akka;
+                                 double h;
+
+                                 h=0.02;
                                  P=0.0;
-                                 sigma = 5.0;
-                                 Tbath = 1.0;
+                                 sigma =10.0;
+                                 Tbath = 1.2;
 
                                  for(akka=-40.0; akka <= 40.0; akka=akka+h){
                                  P = P+ h*(-2.0*I*akka*exp(-(akka*akka)/(sigma*sigma)))*(1.0/tanh((akka/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
