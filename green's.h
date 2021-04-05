@@ -77,6 +77,45 @@ Phononic Bare Green's Functions
       }
 
 
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   Electronic Bare Green's Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+/****************************
+   Function call for GzeroR
+****************************/
+
+      double complex GzeroR (double omega, double t, double tprime)
+          {
+          double complex G;
+          if (t<tprime)
+          {
+             G=0;
+          }
+
+          else{
+             G = -I*cos(omega*(t-tprime))-sin(omega*(t-tprime));
+              }
+
+         		return G;
+         	}
+
+
+/*******************************
+  Function call for GzeroK
+ ******************************/
+
+       double complex GzeroK(double omega, double Tsyst, double nu, double t, double tprime) {
+
+        		double complex G;
+              	G = (I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)))));
+              	return G;
+           	}
+
+
+
+
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Function Call For Self Energies
 for the Test Module
