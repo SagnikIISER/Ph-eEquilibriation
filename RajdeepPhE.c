@@ -28,28 +28,24 @@ Greens Functions, Self Energies and Increments
 Electron Sector
 **************************/
 
-double complex GR[3][1510][1510];
-double complex GA[3][1510][1510];
-
-double complex GK[3][1510][1510];
-double complex SigElR[3][1510][1510];
-double complex SigElK[3][1510][1510];
+double complex GR[6][1510][1510];
+double complex GK[6][1510][1510];
+double complex SigElR[6][1510][1510];
+double complex SigElK[6][1510][1510];
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%
 Phonon Sector
 **************************/
 
-double complex DR[3][1510][1510];
-double complex BarDR[3][1510][1510];
+double complex DR[6][1510][1510];
+double complex BarDR[6][1510][1510];
 
-double complex DA[3][1510][1510];
+double complex DK[6][1510][1510];
+double complex BarDK[6][1510][1510];
 
-double complex DK[3][1510][1510];
-double complex BarDK[3][1510][1510];
-
-double complex SigPhR[3][1510][1510];
-double complex SigPhK[3][1510][1510];
+double complex SigPhR[6][1510][1510];
+double complex SigPhK[6][1510][1510];
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%
 Electron Sector
@@ -200,12 +196,7 @@ for (j=0; j<n; j++){
        		I1[i+1]=P;
      		  P=0.0;
 
-      /*The Advanced Part*/
-
-           GA[0][j][i]=conjf(GR[0][i][j]);
-
-     }
-
+          }
      /*The Keldysh Part*/
 
            for (i=1; i<n ; i++){
@@ -231,7 +222,7 @@ for (j=0; j<n; j++){
 
        						for (l = 1; l < j; l++)
        						{
-       							partial_Sum = partial_Sum+h*SigElK[0][i+1][l]*DA[0][l][j];
+       							partial_Sum = partial_Sum+h*SigElK[0][i+1][l]*conjf(GR[0][j][l]);
        						}
 
 
@@ -241,7 +232,7 @@ for (j=0; j<n; j++){
                            //add each threads partial sum to the total sum
                            total_Sum = partial_Sum;
                    //}
-                   I2[i+1]=total_Sum+(h/2.0)*SigElK[0][i+1][i+1]*DA[0][i+1][j];
+                   I2[i+1]=total_Sum+(h/2.0)*SigElK[0][i+1][i+1]*conjf(GR[0][j][i+1]);
 
                    //}
                    partial_Sum = 0;
@@ -255,7 +246,7 @@ for (j=0; j<n; j++){
           I1[i]=0;
           I2[i]=0;
         }
-        
+
     /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       Phononic Self Energies
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -298,14 +289,6 @@ for (j=0; j<n; j++){
 
 
 
-     /*The Advanced Part*/
-
-
-     for (i=0; i<n ; i++){
-     		DA[0][j][i]=conjf(DR[0][i][j]);
-     }
-
-
      /*The Keldysh Part*/
 
 
@@ -331,7 +314,7 @@ for (j=0; j<n; j++){
 
      						for (l = 1; l < j; l++)
      						{
-     							partial_Sum = partial_Sum+h*SigPhK[0][i+1][l]*DA[0][l][j];
+     							partial_Sum = partial_Sum+h*SigPhK[0][i+1][l]*conjf(DR[0][j][l]);
      						}
 
 
@@ -341,7 +324,7 @@ for (j=0; j<n; j++){
                          //add each threads partial sum to the total sum
                          total_Sum = partial_Sum;
                  //}
-                 I2[i+1]=total_Sum+(h/2.0)*SigPhK[0][i+1][i+1]*DA[0][i+1][j];
+                 I2[i+1]=total_Sum+(h/2.0)*SigPhK[0][i+1][i+1]*conjf(DR[0][j][i]);
 
                  //}
                  partial_Sum = 0;
@@ -368,7 +351,7 @@ for (j=0; j<n; j++){
           if (i>j) {
             SigElK[0][i][j]= -GR[0][i][j]*DR[0][i][j]-GK[0][i][j]*DK[0][i][j];
           }
-          else{  SigElK[0][i][j]= -GA[0][i][j]*DR[0][j][i]-conjf(GK[0][j][i])*DK[0][j][i];}
+          else{  SigElK[0][i][j]= -conjf(GR[0][j][i])*DR[0][j][i]-conjf(GK[0][j][i])*DK[0][j][i];}
 
         }
 
