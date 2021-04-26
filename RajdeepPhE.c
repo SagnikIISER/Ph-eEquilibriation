@@ -29,14 +29,15 @@ Electron Sector
 **************************/
 
 double complex GR[3][1510][1510];
-double complex IER[3][1510][1510];
+double complex IER[1510];
+
 
 double complex GA[3][1510][1510];
 
 double complex GK[3][1510][1510];
 
-double complex IEK1[3][1510][1510];
-double complex IEK2[3][1510][1510];
+double complex IEK1[1510];
+double complex IEK2[1510];
 
 double complex SigElR[3][1510][1510];
 double complex SigElK[3][1510][1510];
@@ -48,15 +49,15 @@ Phonon Sector
 
 double complex DR[3][1510][1510];
 double complex BarDR[3][1510][1510];
-double complex IPR[3][1510][1510];
+double complex IPR[1510];
 
 double complex DA[3][1510][1510];
 
 double complex DK[3][1510][1510];
 double complex BarDK[3][1510][1510];
 
-double complex IPK1[3][1510][1510];
-double complex IPK2[3][1510][1510];
+double complex IPK1[1510];
+double complex IPK2[1510];
 
 double complex SigPhR[3][1510][1510];
 double complex SigPhK[3][1510][1510];
@@ -97,7 +98,7 @@ double main() {
 /*Working around the input variable calls*/
 
     a= 0.000000;					       /*Read value of a*/
-    b= 140.000000;				       /*Read value of b*/
+    b= 15.000000;				       /*Read value of b*/
     h= 0.100000;					       /*Read value of h*/
 
     lambda=1.00000;				       /*Read value of lambda*/
@@ -143,25 +144,17 @@ for (i=0; i<n; i++){
 
   /*Electronic Sector*/
 
-        IER[0][i][i]= 0;
         GR[0][i][i]= -I;
         GK[0][i][i]= I*tanh((epsilon-nu)/(2.0*Telectron));
 
         GR[0][i+1][i]= GzeroR(epsilon,t+h,t);
-        IER[0][i+1][i]= 0;
 
         GK[0][i+1][i]= GzeroK(epsilon,Telectron,nu,t+h,t);
         GK[0][i][i+1]=-conjf(DK[0][i+1][i]);
 
 
-        IEK1[0][i][i]=0;
-        IEK2[0][i][i]=0;
-        IPK1[0][i+1][i]=(h/2.0)*SigElR[0][i+1][i]*DK[0][i][i];
-        IPK2[0][i+1][i]=(h/2.0)*SigElK[0][i+1][i]*DR[0][i+1][i];
-
 /*Phononic Sector*/
 
-        IPR[0][i][i]=0;
         DR[0][i][i]=0;
         BarDR[0][i][i]= -1/2.0;
 
@@ -169,16 +162,11 @@ for (i=0; i<n; i++){
         BarDK[0][i][i]= 0;
 
         DR[0][i+1][i]= -2.0*DzeroR(omega,t+h,t)*BarDR[0][i][i];
-        IPR[0][i+1][i]= 0;
 
 
         DK[0][i+1][i]= -2.0*BarDzeroR(omega,(h*i)+h,(h*i))*DK[0][i][i];
         DK[0][i][i+1]= -conjf(DK[0][i+1][i]);
 
-        IPK1[0][i][i]=0;
-        IPK2[0][i][i]=0;
-        IPK1[0][i+1][i]=(h/2.0)*SigPhR[0][i+1][i]*DK[0][i][i];
-        IPK2[0][i+1][i]=(h/2.0)*SigPhK[0][i+1][i+1]*DR[0][i+1][i];
 
 
    }
@@ -201,7 +189,7 @@ for (j=0; j<n; j++){
 
        	for (i=j+1; i<n; i++){
 
-       	 	GR[0][i+1][j]= -I*GzeroR(epsilon,(i*h)+h,(i*h))*GR[0][i][j]+(h/2.0)*GzeroR(omega,(i*h)+h,(i*h))*IER[0][i][j];
+       	 	GR[0][i+1][j]= -I*GzeroR(epsilon,(i*h)+h,(i*h))*GR[0][i][j]+(h/2.0)*GzeroR(omega,(i*h)+h,(i*h))*IER[i];
 
        				for (l = j+1; l < i; l++)
        				{
@@ -209,7 +197,7 @@ for (j=0; j<n; j++){
        				}
 
 
-       		IER[0][i+1][j]=P;
+       		IER[i+1]=P;
      		  P=0.0;
 
       /*The Advanced Part*/
@@ -222,14 +210,14 @@ for (j=0; j<n; j++){
 
            for (i=1; i<n ; i++){
 
-       		 GK[0][i+1][j]= I*GzeroR(omega,(i*h)+h,(i*h))*GK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IEK1[0][i][j]+IEK2[0][i][j]);
+       		 GK[0][i+1][j]= I*GzeroR(omega,(i*h)+h,(i*h))*GK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IEK1[i]+IEK2[i]);
 
        				for (l = 1; l <= i; l++)
        				{
        					P=P+h*SigElR[0][i+1][l]*DK[0][l][j];
        				}
 
-       		IEK1[0][i+1][j]=P+(h/2.0)*SigElR[0][i+1][j]*DK[0][j][j];
+       		IEK1[i+1]=P+(h/2.0)*SigElR[0][i+1][j]*DK[0][j][j];
        		P=0.0;
 
 
@@ -253,7 +241,7 @@ for (j=0; j<n; j++){
                            //add each threads partial sum to the total sum
                            total_Sum = partial_Sum;
                    //}
-                   IEK2[0][i+1][j]=total_Sum+(h/2.0)*SigElK[0][i+1][i+1]*DA[0][i+1][j];
+                   IEK2[i+1]=total_Sum+(h/2.0)*SigElK[0][i+1][i+1]*DA[0][i+1][j];
 
                    //}
                    partial_Sum = 0;
@@ -291,15 +279,15 @@ for (j=0; j<n; j++){
      /*The Retarded Part*/
 
          	for (i=j+1; i<n; i++){
-         	 	BarDR[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*IPR[0][i-1][j];
-         	 	DR[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*IPR[0][i][j];
+         	 	BarDR[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*IPR[i-1];
+         	 	DR[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*IPR[i];
 
          				for (l = j+1; l < i; l++)
          				{
          					P=P+h*SigPhR[0][i+1][l]*DR[0][l][j];
          				}
 
-         		IPR[0][i+1][j]=P;
+         		IPR[i+1]=P;
          		P=0.0;
          	}
 
@@ -317,15 +305,15 @@ for (j=0; j<n; j++){
 
 
      	for (i=1; i<n ; i++){
-     	  BarDK[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(IPK1[0][i-1][j]+IPK2[0][i-1][j]);
-     		DK[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IPK1[0][i][j]+IPK2[0][i][j]);
+     	  BarDK[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(IPK1[i-1]+IPK2[i-1]);
+     		DK[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IPK1[i]+IPK2[i]);
 
      				for (l = 1; l <= i; l++)
      				{
      					P=P+h*SigPhR[0][i+1][l]*DK[0][l][j];
      				}
 
-     		IPK1[0][i+1][j]=P+(h/2.0)*SigPhR[0][i+1][j]*DK[0][j][j];
+     		IPK1[i+1]=P+(h/2.0)*SigPhR[0][i+1][j]*DK[0][j][j];
 
 
              //#pragma omp parallel private(partial_Sum) shared(total_Sum)
@@ -348,7 +336,7 @@ for (j=0; j<n; j++){
                          //add each threads partial sum to the total sum
                          total_Sum = partial_Sum;
                  //}
-                 IPK2[0][i+1][j]=total_Sum+(h/2.0)*SigPhK[0][i+1][i+1]*DA[0][i+1][j];
+                 IPK2[i+1]=total_Sum+(h/2.0)*SigPhK[0][i+1][i+1]*DA[0][i+1][j];
 
                  //}
                  partial_Sum = 0;
