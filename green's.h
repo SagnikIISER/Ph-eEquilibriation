@@ -109,7 +109,7 @@ Phononic Bare Green's Functions
        double complex GzeroK(double omega, double Tsyst, double nu, double t, double tprime) {
 
         		double complex G;
-              	G = (I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)))));
+              	G = (I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)));
               	return G;
            	}
 
@@ -137,14 +137,13 @@ for the Test Module
 
               if (t<tprime) {
                   D=0;
+                }
          		  else{
                 D= -(1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(t-tprime)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
               }
 
               return D;
          	}
-
-        }
 
 /*********************************
    Function call for SigmaRP
@@ -183,7 +182,7 @@ for the Test Module
 
                                  h=0.02;
                                  P=0.0;
-                                 sigma =10.0;
+                                 sigma = 10.0;
                                  Tbath = 1.2;
 
                                  for(akka=-40.0; akka <= 40.0; akka=akka+h){
@@ -194,3 +193,31 @@ for the Test Module
 
              return D;
              }
+
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%
+    Fermi functions
+***********************/
+
+double Fermi( double epsilon, double beta, double nu) {
+float n;
+n = 1/(exp(beta*(epsilon-nu))-1);
+return n;
+}
+
+
+
+double FermiD1( double epsilon, double beta, double nu) {
+float n;
+n = -(epsilon-nu)*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))-1)*(exp(beta*(epsilon-nu))-1));
+return n;
+}
+
+
+
+double FermiD2( double epsilon, double beta, double nu) {
+float n;
+n = beta*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))-1)*(exp(beta*(epsilon-nu))-1));
+return n;
+}
