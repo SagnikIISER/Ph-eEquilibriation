@@ -24,14 +24,14 @@ int main()
 
     /*Lattice Parameters*/
 
-        ktot= 200;					           /*Phononic Lattice Dimension*/
+        ktot= 31;					           /*Phononic Lattice Dimension*/
         A=1;						             /*Read value of Phononic Lattice Constant*/
 
         double epsilon[ktot];					        /*Initial Energy Level*/
         double n[ktot];					        /*Initial Energy Level*/
 
-beta0 = 1.2;
-nu0 = -1;
+beta0 = 1;
+nu0 = -2.5;
 
 for (klevel=0; klevel<ktot; klevel=klevel+1){
     /*Momentum values at Dummy Indicies*/
@@ -47,22 +47,29 @@ for (klevel=0; klevel<ktot; klevel=klevel+1){
            N=N+n[klevel];
            E=E+epsilon[klevel]*n[klevel];
 
-//           printf("%d\t%f\n", klevel, n[klevel]);
-
 }
+
+
+           printf("%f\t%f\n", N, E);
 
 /**********************
 Beta Guess, Nu Guess
+Note: sign of the guess must be same to actual solution
+which is always guaranted in our case
 **********************/
 
-beta0 = 1.3;
-nu0 = -0.7;
-l=0.000001;
-maxmitr=100000;
+beta0 = 0.8;
+nu0 = -1.0;
+l=0.01;
+maxmitr=100;
+
+
+
 
 /**********************
 Newton Rhapson
 **********************/
+
 for (itr=1; itr<=maxmitr; itr++)
 {
 
@@ -84,6 +91,12 @@ f2=f2-E;  //Here is where the update comes
 beta1 = beta0 - a22*f1/det+a12*f2/det;
 nu1 = nu0 +a21*f1/det - a11*f2/det;
 
+a11=0;
+a12=0;
+a21=0;
+a22=0;
+f1=0;
+f2=0;
 //printf("\n%f\t%f\n", beta1, nu1);
 
 printf(" At Iteration no. %3d, beta = %9.6f, nu = %12.6f\n", itr, beta1, nu1);
@@ -98,8 +111,10 @@ if (fabs(nu1-nu0) < l)
 }
 nu0 = nu1;
 beta0 = beta1;
-}
 
+
+
+}
 
     printf(" The required solution does not converge or iterations are insufficient\n");
 
