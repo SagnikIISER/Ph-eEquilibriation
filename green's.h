@@ -202,7 +202,7 @@ for the Test Module
 
 double Fermi( double epsilon, double beta, double nu) {
 float n;
-n = 1/(exp(beta*(epsilon-nu))-1);
+n = 1/(exp(beta*(epsilon-nu))+1);
 return n;
 }
 
@@ -210,7 +210,7 @@ return n;
 
 double FermiD1( double epsilon, double beta, double nu) {
 float n;
-n = -(epsilon-nu)*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))-1)*(exp(beta*(epsilon-nu))-1));
+n = -(epsilon-nu)*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))+1)*(exp(beta*(epsilon-nu))+1));
 return n;
 }
 
@@ -218,6 +218,6 @@ return n;
 
 double FermiD2( double epsilon, double beta, double nu) {
 float n;
-n = beta*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))-1)*(exp(beta*(epsilon-nu))-1));
+n = beta*exp(beta*(epsilon-nu))/((exp(beta*(epsilon-nu))+1)*(exp(beta*(epsilon-nu))+1));
 return n;
 }
