@@ -47,16 +47,22 @@ double complex BarDK[6][1510][1510];
 double complex SigPhR[6][1510][1510];
 double complex SigPhK[6][1510][1510];
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%
-Electron Sector
-**************************/
 
-double complex I1[1510];
-double complex I2[1510];
+double complex GKtt1[30];
+double complex GKtt[30];
 
+double nel[30][1510];
+double nph[30][1510];
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Energy Spectra and Other Variables
+**********************************/
 
+double epsilon[30];
+double omega[30];
 
+double Beta[1510];
+double Nu[1510];
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,6 +72,8 @@ Main Module
 double main() {
 
 
+  double complex IPh1A, IPh1B, IPh2A, IPh2B, IPh3A, IPh3B;
+  double complex IEl1A, IEl2A, IEl3A;
 
 /*Definitions*/
 
@@ -76,8 +84,9 @@ double main() {
 
   double A;					             /*Lattice Constant*/
   int    n, klevel, ktot;				 /*Array Dimension*/
+  int    plevel;		        		 /*Array Dimension*/
   double K;					             /*Momentum Formula*/
-  double omega, epsilon;				 /*Initial Phononic, Electronic Energy Levels respectively*/
+//  double omega, epsilon;			 /*Initial Phononic, Electronic Energy Levels respectively*/
   double lambda;					       /*Perturbation Strength*/
 
   double Tphonon, Telectron;     /*Phonon and Electron Temp*/
@@ -94,7 +103,7 @@ double main() {
 /*Working around the input variable calls*/
 
     a= 0.000000;					       /*Read value of a*/
-    b= 15.000000;				       /*Read value of b*/
+    b= 25.000000;				       /*Read value of b*/
     h= 0.100000;					       /*Read value of h*/
 
     lambda=1.00000;				       /*Read value of lambda*/
@@ -102,9 +111,9 @@ double main() {
 
 /*Phononic Lattice Parameters*/
 
-    ktot= 19;					           /*Phononic Lattice Dimension*/
+    ktot= 3;					           /*Phononic Lattice Dimension*/
     A=1;						             /*Read value of Phononic Lattice Constant*/
-    klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
+//  klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
 
 
 
@@ -117,18 +126,23 @@ double main() {
   Energy Levels
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
+for (klevel=0; klevel<ktot+1; klevel++) {
+
 /*Momentum values at Dummy Indicies*/
-   K=((-3.1418/A)+klevel*(6.2836/A)/(ktot-1.0));
+   K=((-3.1418/A)+klevel*(6.2836/A)/(ktot));
 
 /*Phononic Dispersion Relation*/
-   omega=3.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
+   omega[klevel]=3.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
 
 /*Electronic Dispersion Relation*/
-   epsilon= K*K/2.00000;
+   epsilon[klevel]= K*K/2.00000;
 
+}
 
-
-//printf("%f\t%f\n", omega,epsilon );
+/*
+for (klevel=0; klevel< ktot+1; klevel++) {
+printf("%d\t%f\t%f\n", klevel, omega[klevel], epsilon[klevel] );
+}
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  Initial Condition
@@ -136,43 +150,42 @@ double main() {
 
 
 for (i=0; i<n; i++){
-
+for (klevel=0; klevel< ktot+1; klevel++) {
 
   /*Electronic Sector*/
 
-        GR[0][i][i]= -I;
-        GK[0][i][i]= I*tanh((epsilon-nu)/(2.0*Telectron));
+        GR[klevel][i][i]= -I;
+        GK[klevel][i][i]= I*tanh((epsilon[klevel]-nu)/(2.0*Telectron));
 
-        GR[0][i+1][i]= GzeroR(epsilon,t+h,t);
+        GR[klevel][i+1][i]= GzeroR(epsilon[klevel],t+h,t);
 
-        GK[0][i+1][i]= GzeroK(epsilon,Telectron,nu,t+h,t);
-        GK[0][i][i+1]=-conjf(DK[0][i+1][i]);
+        GK[klevel][i+1][i]= GzeroK(epsilon[klevel],Telectron,nu,t+h,t);
+        GK[klevel][i][i+1]=-conjf(DK[klevel][i+1][i]);
 
 
 /*Phononic Sector*/
 
-        DR[0][i][i]=0;
-        BarDR[0][i][i]= -1/2.0;
+        DR[klevel][i][i]=0;
+        BarDR[klevel][i][i]= -1/2.0;
 
-        DK[0][i][i]=-(I/(2.0*omega))*(1.0/(tanh((omega)/(2*Tphonon))));
-        BarDK[0][i][i]= 0;
+        DK[klevel][i][i]=-(I/(2.0*omega[klevel]))*(1.0/(tanh((omega[klevel])/(2*Tphonon))));
+        BarDK[klevel][i][i]= 0;
 
-        DR[0][i+1][i]= -2.0*DzeroR(omega,t+h,t)*BarDR[0][i][i];
+        DR[klevel][i+1][i]= -2.0*DzeroR(omega[klevel],t+h,t)*BarDR[klevel][i][i];
 
 
-        DK[0][i+1][i]= -2.0*BarDzeroR(omega,(h*i)+h,(h*i))*DK[0][i][i];
-        DK[0][i][i+1]= -conjf(DK[0][i+1][i]);
+        DK[klevel][i+1][i]= -2.0*BarDzeroR(omega[klevel],(h*i)+h,(h*i))*DK[klevel][i][i];
+        DK[klevel][i][i+1]= -conjf(DK[klevel][i+1][i]);
 
 
 
    }
-
+}
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Dyson Iteration
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
 
 for (j=0; j<n; j++){
 
@@ -184,31 +197,32 @@ for (j=0; j<n; j++){
      /*The Retarded Part*/
 
        	for (i=j+1; i<n; i++){
+          for (klevel=0; klevel< ktot+1; klevel++) {
 
-       	 	GR[0][i+1][j]= -I*GzeroR(epsilon,(i*h)+h,(i*h))*GR[0][i][j]+(h/2.0)*GzeroR(omega,(i*h)+h,(i*h))*I1[i];
+       	 	GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(omega[klevel],(i*h)+h,(i*h))*IEl1A;
 
        				for (l = j+1; l < i; l++)
        				{
-       					P=P+h*SigElR[0][i+1][l]*GR[0][l][j];
+       					P=P+h*SigElR[klevel][i+1][l]*GR[klevel][l][j];
        				}
 
 
-       		I1[i+1]=P;
+       		IEl1A=P;
      		  P=0.0;
-
+            }
           }
      /*The Keldysh Part*/
 
            for (i=1; i<n ; i++){
-
-       		 GK[0][i+1][j]= I*GzeroR(omega,(i*h)+h,(i*h))*GK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I1[i]+I2[i]);
+             for (klevel=0; klevel< ktot+1; klevel++) {
+       		 GK[klevel][i+1][j]= I*GzeroR(omega[klevel],(i*h)+h,(i*h))*GK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IEl2A+IEl3A);
 
        				for (l = 1; l <= i; l++)
        				{
-       					P=P+h*SigElR[0][i+1][l]*DK[0][l][j];
+       					P=P+h*SigElR[klevel][i+1][l]*DK[klevel][l][j];
        				}
 
-       		I1[i+1]=P+(h/2.0)*SigElR[0][i+1][j]*DK[0][j][j];
+       		IEl2A=P+(h/2.0)*SigElR[klevel][i+1][j]*DK[klevel][j][j];
        		P=0.0;
 
 
@@ -222,7 +236,7 @@ for (j=0; j<n; j++){
 
        						for (l = 1; l < j; l++)
        						{
-       							partial_Sum = partial_Sum+h*SigElK[0][i+1][l]*conjf(GR[0][j][l]);
+       							partial_Sum = partial_Sum+h*SigElK[klevel][i+1][l]*conjf(GR[klevel][j][l]);
        						}
 
 
@@ -232,38 +246,63 @@ for (j=0; j<n; j++){
                            //add each threads partial sum to the total sum
                            total_Sum = partial_Sum;
                    //}
-                   I2[i+1]=total_Sum+(h/2.0)*SigElK[0][i+1][i+1]*conjf(GR[0][j][i+1]);
+                   IEl3A=total_Sum+(h/2.0)*SigElK[klevel][i+1][i+1]*conjf(GR[klevel][j][i+1]);
 
                    //}
                    partial_Sum = 0;
                    total_Sum = 0;
 
-       		GK[0][j][i+1]=-conjf(GK[0][i+1][j]);
-
+       		GK[klevel][j][i+1]=-conjf(GK[klevel][i+1][j]);
+         }
        	}
 
-        for (i=0; i<n; i++){
-          I1[i]=0;
-          I2[i]=0;
-        }
 
     /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       Phononic Self Energies
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
         for (i=j+1; i<n; i++){
-            SigPhR[0][i][j]= -crealf(I*GK[0][i][j]*conjf(GR[0][i][j]));
+          for (klevel=0; klevel< ktot+1; klevel++) {
+
+              for (plevel=0; plevel< ktot+1; plevel++) {
+                if (klevel+plevel<=ktot)
+                {
+                  SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
+                }
+                if (klevel+plevel>ktot)
+                {
+                  SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
+                }
+            }
+          }
         }
 
         for (i=1; i<n; i++){
-          if (i>j) {
-            SigPhK[0][i][j]= GR[0][i][j]*conjf(GR[0][i][j])+GK[0][i][j]*conjf(GK[0][i][j]) ;
-                    }
-                    else
-                  {SigPhK[0][i][j]= GR[0][j][i]*conjf(GR[0][j][i])+GK[0][i][j]*conjf(GK[0][i][j]) ;
+          for (klevel=0; klevel< ktot+1; klevel++) {
+            for (plevel=0; plevel< ktot+1; plevel++) {
+              if (klevel+plevel<=ktot)
+              {
+                  if (i>j)
+                  {
+                    SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
                   }
-
+                  else{
+                    SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+                  }
+              }
+              if (klevel+plevel>ktot)
+              {
+                  if (i>j)
+                  {
+                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[plevel][i][j]) ;
+                    }
+                  else{
+                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[klevel][i][j]) ;
+                  }
+              }
+          }
         }
+      }
 
 
      /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -275,33 +314,42 @@ for (j=0; j<n; j++){
      /*The Retarded Part*/
 
          	for (i=j+1; i<n; i++){
-         	 	BarDR[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*I1[i-1];
-         	 	DR[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*I1[i];
 
+            for (klevel=0; klevel< ktot+1; klevel++) {
+
+         	 	BarDR[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDR[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DR[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*IPh1B;
+         	 	DR[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DR[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*IPh1A;
+
+            IPh1B=IPh1A;
          				for (l = j+1; l < i; l++)
          				{
-         					P=P+h*SigPhR[0][i+1][l]*DR[0][l][j];
+         					P=P+h*SigPhR[klevel][i+1][l]*DR[klevel][l][j];
          				}
 
-         		I1[i+1]=P;
+         		IPh1A=P;
          		P=0.0;
          	}
-
-
+        }
 
      /*The Keldysh Part*/
 
 
      	for (i=1; i<n ; i++){
-     	  BarDK[0][i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[0][i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[0][i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(I1[i-1]+I2[i-1]);
-     		DK[0][i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[0][i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[0][i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I1[i]+I2[i]);
+
+        for (klevel=0; klevel< ktot+1; klevel++) {
+
+     	  BarDK[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDK[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DK[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*(IPh2B+IPh3B);
+     		DK[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDK[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IPh2A+IPh3A);
+
+        IPh2B=IPh2A;
+        IPh3B=IPh3A;
 
      				for (l = 1; l <= i; l++)
+            P=P+h*SigPhR[klevel][i+1][l]*DK[klevel][l][j];
      				{
-     					P=P+h*SigPhR[0][i+1][l]*DK[0][l][j];
      				}
 
-     		I1[i+1]=P+(h/2.0)*SigPhR[0][i+1][j]*DK[0][j][j];
+     		IPh2A=P+(h/2.0)*SigPhR[klevel][i+1][j]*DK[klevel][j][j];
 
 
              //#pragma omp parallel private(partial_Sum) shared(total_Sum)
@@ -314,7 +362,7 @@ for (j=0; j<n; j++){
 
      						for (l = 1; l < j; l++)
      						{
-     							partial_Sum = partial_Sum+h*SigPhK[0][i+1][l]*conjf(DR[0][j][l]);
+     							partial_Sum = partial_Sum+h*SigPhK[klevel][i+1][l]*conjf(DR[klevel][j][l]);
      						}
 
 
@@ -324,17 +372,17 @@ for (j=0; j<n; j++){
                          //add each threads partial sum to the total sum
                          total_Sum = partial_Sum;
                  //}
-                 I2[i+1]=total_Sum+(h/2.0)*SigPhK[0][i+1][i+1]*conjf(DR[0][j][i]);
+                 IPh3A=total_Sum+(h/2.0)*SigPhK[klevel][i+1][i+1]*conjf(DR[klevel][j][i]);
 
                  //}
                  partial_Sum = 0;
                  total_Sum = 0;
 
-     		DK[0][j][i+1]=-conjf(DK[0][i+1][j]);
-     		BarDK[0][j][i]=conjf(BarDK[0][i][j]);
+     		DK[klevel][j][i+1]=-conjf(DK[klevel][i+1][j]);
+     		BarDK[klevel][j][i]=conjf(BarDK[klevel][i][j]);
 
      	}
-
+    }
 
 
 
@@ -344,25 +392,50 @@ for (j=0; j<n; j++){
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
         for (i=j+1; i<n; i++){
-            SigElR[0][i][j]= I*GR[0][i][j]*DK[0][i][j]+I*GK[0][i][j]*DR[0][i][j];
+          for (klevel=0; klevel< ktot+1; klevel++) {
+            for (plevel=0; plevel< ktot+1; plevel++) {
+              if (klevel+plevel<=ktot)
+              {
+              SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
+              }
+              if (klevel+plevel>ktot)
+              {
+              SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel-ktot][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
+              }
         }
+      }
 
         for (i=1; i<n; i++){
-          if (i>j) {
-            SigElK[0][i][j]= -GR[0][i][j]*DR[0][i][j]-GK[0][i][j]*DK[0][i][j];
-          }
-          else{  SigElK[0][i][j]= -conjf(GR[0][j][i])*DR[0][j][i]-conjf(GK[0][j][i])*DK[0][j][i];}
-
+          for (klevel=0; klevel< ktot+1; klevel++) {
+            for (plevel=0; plevel< ktot+1; plevel++) {
+              if (klevel+plevel<=ktot)
+              {
+                  if (i>j)
+                  {
+                    SigElK[klevel][i][j]= -GR[klevel+plevel][i][j]*DR[plevel][i][j]-GK[klevel+plevel][i][j]*DK[plevel][i][j];
+                      }
+                  else{
+                    SigElK[klevel][i][j]= -conjf(GR[klevel+plevel][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel][j][i])*DK[plevel][j][i];
+                      }
+              }
+              if (klevel+plevel>ktot)
+              {
+                  if (i>j)
+                  {
+                    SigElK[klevel][i][j]= -GR[klevel+plevel-ktot][i][j]*DR[plevel][i][j]-GK[klevel+plevel-ktot][i][j]*DK[plevel][i][j];
+                      }
+                  else{
+                    SigElK[klevel][i][j]= -conjf(GR[klevel+plevel-ktot][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel-ktot][j][i])*DK[plevel][j][i];
+                      }
+              }
         }
-
-
-   }
-
-
+       }
+      }
+    }
+  }
    for (i = 0; i < n; i++){
    printf("%f\t%f\t%f\n", i*h , -cimagf(DK[0][i][i]), cimagf(GK[0][i][i]) )  ;
    }
-
 
 
 }
