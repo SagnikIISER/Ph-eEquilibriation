@@ -238,6 +238,7 @@ for (i=1; i<n; i++){
   BarDK[k][i] = -2.0*BarDzeroR(omega,(k*h),(k*h)-h)*BarDK[k-1][i]+2.0*omega*omega*DzeroR(omega,(k*h),(k*h)-h)*DK[k-1][i]+(h/2.0)*BarDzeroR(omega,(k*h),(k*h)-h)*(I3[k-1]+I2[k-1]);
   DK[k+1][i]= -2.0*DzeroR(omega,(k*h)+h,(k*h))*BarDK[k][i]-2.0*BarDzeroR(omega,(k*h)+h,(k*h))*DK[k][i]+(h/2.0)*DzeroR(omega,(k*h)+h,(k*h))*(I3[k]+I2[k]);
 
+
       for (l = 1; l <= k; l++)
       {
         P=P+h*lambda*lambda*SigmaR((k*h)+h,(h*l))*DK[l][i];
