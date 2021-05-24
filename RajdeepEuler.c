@@ -105,30 +105,16 @@ Momentum values at Dummy Indicies
 System Dispersion Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
- omega=2.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
+ omega= 2.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
  nomega= 1/(exp(omega/Tsyst)-1);
+
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  To Plot the Dispersion Relation
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*
 printf("%d\t%f\t%f\t%f\n", klevel, K, omega, nomega );
-
 }
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Computing the DK thermal
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-/*
-
-
-
-P=0.0;
-
-for(akka=-100; akka <= 100; akka=akka+h){
-P = P + h*(lambda*lambda*akka*exp(-(akka*akka/(sigma*sigma))))/((2.0*akka*akka-2.0*omega*omega+lambda*lambda*(sigma/sqrt(3.14159265))-lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))*(2.0*akka*akka-2.0*omega*omega+lambda*lambda*(sigma/sqrt(3.14159265))-lambda*lambda*(2.0/sqrt(3.14159265))*akka*Dawson(akka/sigma))+(lambda*lambda*lambda*lambda*akka*akka*exp(-2.0*(akka*akka/(sigma*sigma)))))*(1.0/tanh((akka/(2.0*Tbath))));
-}
-
-DKthermal = P/(3.14159265);
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,7 +246,7 @@ for (i=1; i<n; i++){
 
           I2[k+1][i]=P+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
 
-          P=0.0;
+      P=0.0;
   }
 	}
 
