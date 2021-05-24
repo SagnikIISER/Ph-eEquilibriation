@@ -64,6 +64,9 @@ double omega[30];
 double Beta[1510];
 double Nu[1510];
 
+double complex IPh1A[1510], IPh1B[1510], IPh2A[1510], IPh2B[1510], IPh3A[1510], IPh3B[1510], I2[1510], I3[1510];
+double complex IEl1A[1510], IEl1B[1510], IEl2A[1510], IEl2B[1510], IEl3A[1510], IEl3B[1510];
+
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
@@ -72,370 +75,381 @@ Main Module
 double main() {
 
 
-  double complex IPh1A, IPh1B, IPh2A, IPh2B, IPh3A, IPh3B;
-  double complex IEl1A, IEl2A, IEl3A;
 
-/*Definitions*/
+  /*Definitions*/
 
-  double t, tprime;				       /*time parameters*/
-  double a,b; 					         /*to be used for lower and upper bound on time*/
-  double tone, ttwo;				     /*extra variables*/
-  double h;					             /*time increment*/
+    double t, tprime;				       /*time parameters*/
+    double a,b; 					         /*to be used for lower and upper bound on time*/
+    double tone, ttwo;				     /*extra variables*/
+    double h;					             /*time increment*/
 
-  double A;					             /*Lattice Constant*/
-  int    n, klevel, ktot;				 /*Array Dimension*/
-  int    plevel;		        		 /*Array Dimension*/
-  double K;					             /*Momentum Formula*/
-//  double omega, epsilon;			 /*Initial Phononic, Electronic Energy Levels respectively*/
-  double lambda;					       /*Perturbation Strength*/
+    double A;					             /*Lattice Constant*/
+    int    n, klevel, ktot;				 /*Array Dimension*/
+    int    plevel;		        		 /*Array Dimension*/
+    double K;					             /*Momentum Formula*/
+  //  double omega, epsilon;			 /*Initial Phononic, Electronic Energy Levels respectively*/
+    double lambda;					       /*Perturbation Strength*/
 
-  double Tphonon, Telectron;     /*Phonon and Electron Temp*/
-  double nu;                     /*Chemical Potential*/
-  double complex P;
+    double Tphonon, Telectron;     /*Phonon and Electron Temp*/
+    double nu;                     /*Chemical Potential*/
+    double complex P;
 
 
-  double complex partial_Sum, total_Sum;
+    double complex partial_Sum, total_Sum;
 
-    int i;
-    int j;
-    int l;
+      int i;
+      int j;
+      int l;
 
-/*Working around the input variable calls*/
+  /*Working around the input variable calls*/
 
-    a= 0.000000;					       /*Read value of a*/
-    b= 25.000000;				       /*Read value of b*/
-    h= 0.100000;					       /*Read value of h*/
+      a= 0.000000;					       /*Read value of a*/
+      b= 25.000000;				       /*Read value of b*/
+      h= 0.100000;					       /*Read value of h*/
 
-    lambda=1.00000;				       /*Read value of lambda*/
-    n=(int)((b-a)/h)+1;			     /*array Dimension*/
+      lambda=1.00000;				       /*Read value of lambda*/
+      n=(int)((b-a)/h)+1;			     /*array Dimension*/
 
-/*Phononic Lattice Parameters*/
+  /*Phononic Lattice Parameters*/
 
-    ktot= 3;					           /*Phononic Lattice Dimension*/
-    A=1;						             /*Read value of Phononic Lattice Constant*/
-//  klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
+      ktot= 1;					           /*Phononic Lattice Dimension*/
+      A=1;						             /*Read value of Phononic Lattice Constant*/
+  //  klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
 
 
 
-/*Reading the Initial Temp*/
-    Tphonon=  1.000000;
-    Telectron=1.000000;
-    nu = -1.0000;
+  /*Reading the Initial Temp*/
+      Tphonon=  1.000000;
+      Telectron=1.000000;
+      nu = -1.0000;
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  Energy Levels
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+  /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    Energy Levels
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-for (klevel=0; klevel<ktot+1; klevel++) {
+  for (klevel=0; klevel<ktot+1; klevel++) {
 
-/*Momentum values at Dummy Indicies*/
-   K=((-3.1418/A)+klevel*(6.2836/A)/(ktot));
+  /*Momentum values at Dummy Indicies*/
+     K=((-3.1418/A)+klevel*(6.2836/A)/(ktot));
 
-/*Phononic Dispersion Relation*/
-   omega[klevel]=3.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
+  /*Phononic Dispersion Relation*/
+     omega[klevel]=3.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
 
-/*Electronic Dispersion Relation*/
-   epsilon[klevel]= K*K/2.00000;
+  /*Electronic Dispersion Relation*/
+     epsilon[klevel]= K*K/2.00000;
 
-}
+  }
 
-/*
-for (klevel=0; klevel< ktot+1; klevel++) {
-printf("%d\t%f\t%f\n", klevel, omega[klevel], epsilon[klevel] );
-}
+  /*
+  for (klevel=0; klevel< ktot+1; klevel++) {
+  printf("%d\t%f\t%f\n", klevel, omega[klevel], epsilon[klevel] );
+  }
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- Initial Condition
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
-for (i=0; i<n; i++){
-for (klevel=0; klevel< ktot+1; klevel++) {
-
-  /*Electronic Sector*/
-
-        GR[klevel][i][i]= -I;
-        GK[klevel][i][i]= I*tanh((epsilon[klevel]-nu)/(2.0*Telectron));
-
-        GR[klevel][i+1][i]= GzeroR(epsilon[klevel],t+h,t);
-
-        GK[klevel][i+1][i]= GzeroK(epsilon[klevel],Telectron,nu,t+h,t);
-        GK[klevel][i][i+1]=-conjf(DK[klevel][i+1][i]);
+  /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   Initial Condition
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-/*Phononic Sector*/
+  for (i=0; i<n; i++){
+  for (klevel=0; klevel< ktot+1; klevel++) {
 
-        DR[klevel][i][i]=0;
-        BarDR[klevel][i][i]= -1/2.0;
+    /*Electronic Sector*/
 
-        DK[klevel][i][i]=-(I/(2.0*omega[klevel]))*(1.0/(tanh((omega[klevel])/(2*Tphonon))));
-        BarDK[klevel][i][i]= 0;
+          GR[klevel][i][i]= -I;
+          GK[klevel][i][i]= I*tanh((epsilon[klevel]-nu)/(2.0*Telectron));
 
-        DR[klevel][i+1][i]= -2.0*DzeroR(omega[klevel],t+h,t)*BarDR[klevel][i][i];
+          GR[klevel][i+1][i]= GzeroR(epsilon[klevel],t+h,t);
 
-
-        DK[klevel][i+1][i]= -2.0*BarDzeroR(omega[klevel],(h*i)+h,(h*i))*DK[klevel][i][i];
-        DK[klevel][i][i+1]= -conjf(DK[klevel][i+1][i]);
-
+          GK[klevel][i+1][i]= GzeroK(epsilon[klevel],Telectron,nu,t+h,t);
+          GK[klevel][i][i+1]=-conjf(DK[klevel][i+1][i]);
 
 
-   }
-}
+  /*Phononic Sector*/
+
+          DR[klevel][i][i]=0;
+          BarDR[klevel][i][i]= -1/2.0;
+
+          DK[klevel][i][i]=-(I/(2.0*omega[klevel]))*(1.0/(tanh((omega[klevel])/(2*Tphonon))));
+          BarDK[klevel][i][i]= 0;
+
+          DR[klevel][i+1][i]= -2.0*DzeroR(omega[klevel],t+h,t)*BarDR[klevel][i][i];
 
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Dyson Iteration
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-for (j=0; j<n; j++){
+          DK[klevel][i+1][i]= -2.0*BarDzeroR(omega[klevel],(h*i)+h,(h*i))*DK[klevel][i][i];
+          DK[klevel][i][i+1]= -conjf(DK[klevel][i+1][i]);
 
 
-  /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   Electron Sector
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-     /*The Retarded Part*/
-
-       	for (i=j+1; i<n; i++){
-          for (klevel=0; klevel< ktot+1; klevel++) {
-
-       	 	GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(omega[klevel],(i*h)+h,(i*h))*IEl1A;
-
-       				for (l = j+1; l < i; l++)
-       				{
-       					P=P+h*SigElR[klevel][i+1][l]*GR[klevel][l][j];
-       				}
+     }
+  }
 
 
-       		IEl1A=P;
-     		  P=0.0;
-            }
+  /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  Dyson Iteration
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+  for (i=0; i<n; i++){
+
+
+       /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+       Phonon Sector
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+
+       /*The Retarded Part*/
+
+       for (klevel=0; klevel<= ktot; klevel++) {
+            for (j=1; j<i; j++){
+           	 	BarDR[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDR[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DR[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*IPh1B[j];
+           	 	DR[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DR[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*IPh1A[j];
+
+              IPh1B[j]=IPh1A[j];
+           				for (l = j+1; l < i; l++)
+           				{
+           					P=P+h*SigPhR[klevel][i+1][l]*DR[klevel][l][j];
+           				}
+
+           		IPh1A[j]=P;
+           		P=0.0;
+           	}
           }
-     /*The Keldysh Part*/
 
-           for (i=1; i<n ; i++){
-             for (klevel=0; klevel< ktot+1; klevel++) {
-       		 GK[klevel][i+1][j]= I*GzeroR(omega[klevel],(i*h)+h,(i*h))*GK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IEl2A+IEl3A);
+       /*The Keldysh Part*/
+
+
+
+        for (j=0; j<i; j++){
+
+       	  BarDK[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDK[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DK[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*(IPh2B[j]+IPh3B[j]);
+       		DK[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDK[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IPh2A[j]+IPh3A[j]);
+
+          IPh2B[j]=IPh2A[j];
+          IPh3B[j]=IPh3A[j];
 
        				for (l = 1; l <= i; l++)
+              P=P+h*SigPhR[klevel][i+1][l]*DK[klevel][l][j];
        				{
-       					P=P+h*SigElR[klevel][i+1][l]*DK[klevel][l][j];
        				}
 
-       		IEl2A=P+(h/2.0)*SigElR[klevel][i+1][j]*DK[klevel][j][j];
-       		P=0.0;
+       		IPh2A[j]=P+(h/2.0)*SigPhR[klevel][i+1][j]*DK[klevel][j][j];
 
 
-               //#pragma omp parallel private(partial_Sum) shared(total_Sum)
-               //{
+                  P=0;
 
-                     partial_Sum = 0;
-                     total_Sum = 0;
-
-               //#pragma omp for
-
-       						for (l = 1; l < j; l++)
+                  for (l = 1; l < j; l++)
        						{
-       							partial_Sum = partial_Sum+h*SigElK[klevel][i+1][l]*conjf(GR[klevel][j][l]);
+       							P = P + h*SigPhK[klevel][i+1][l]*conjf(DR[klevel][j][l]);
        						}
 
+                   IPh3A[j]=total_Sum+(h/2.0)*SigPhK[klevel][i+1][i+1]*conjf(DR[klevel][j][i]);
 
-                   //Create thread safe region.
-                   //#pragma omp critical
-                   //{
-                           //add each threads partial sum to the total sum
-                           total_Sum = partial_Sum;
-                   //}
-                   IEl3A=total_Sum+(h/2.0)*SigElK[klevel][i+1][i+1]*conjf(GR[klevel][j][i+1]);
 
-                   //}
-                   partial_Sum = 0;
-                   total_Sum = 0;
+                   P = 0;
 
-       		GK[klevel][j][i+1]=-conjf(GK[klevel][i+1][j]);
-         }
+       		DK[klevel][j][i+1]=-conjf(DK[klevel][i+1][j]);
+       		BarDK[klevel][j][i]=conjf(BarDK[klevel][i][j]);
+
        	}
 
+        for (k=1; k<=i; k++)
 
-    /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Phononic Self Energies
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+        {
+        BarDK[klevel][k][i] = -2.0*BarDzeroR(omega[klevel],(k*h),(k*h)-h)*BarDK[klevel][k-1][i]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(k*h),(k*h)-h)*DK[klevel][k-1][i]+(h/2.0)*BarDzeroR(omega[klevel],(k*h),(k*h)-h)*(I3[k-1]+I2[k-1]);
+        DK[klevel][k+1][i]= -2.0*DzeroR(omega[klevel],(k*h)+h,(k*h))*BarDK[klevel][k][i]-2.0*BarDzeroR(omega[klevel],(k*h)+h,(k*h))*DK[klevel][k][i]+(h/2.0)*DzeroR(omega[klevel],(k*h)+h,(k*h))*(I3[k]+I2[k]);
 
-        for (i=j+1; i<n; i++){
-          for (klevel=0; klevel< ktot+1; klevel++) {
 
+            for (l = 1; l <= k; l++)
+            {
+              P=P+h*lambda*lambda*SigmaR((k*h)+h,(h*l))*DK[klevel][l][i];
+            }
+
+            I3[k+1]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[klevel][i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[klevel][k+1][i];
+
+            P=0.0;
+
+                for (l = 1; l < i; l++)
+                {
+                  P = P + h*lambda*lambda*SigK[k+1][l]*conjf(DR[klevel][i][l]);
+                }
+
+
+            I2[k+1]=P+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[klevel][i][k+1]);
+
+            P=0.0;
+        }
+
+
+
+      /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        Electronic Self Energies
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+          for (i=j+1; i<n; i++){
+            for (klevel=0; klevel< ktot+1; klevel++) {
               for (plevel=0; plevel< ktot+1; plevel++) {
                 if (klevel+plevel<=ktot)
                 {
-                  SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
+                SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
                 }
                 if (klevel+plevel>ktot)
                 {
-                  SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
+                SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel-ktot][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
                 }
-            }
           }
         }
 
-        for (i=1; i<n; i++){
-          for (klevel=0; klevel< ktot+1; klevel++) {
-            for (plevel=0; plevel< ktot+1; plevel++) {
-              if (klevel+plevel<=ktot)
-              {
-                  if (i>j)
-                  {
-                    SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
-                  }
-                  else{
-                    SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
-                  }
-              }
-              if (klevel+plevel>ktot)
-              {
-                  if (i>j)
-                  {
-                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[plevel][i][j]) ;
-                    }
-                  else{
-                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[klevel][i][j]) ;
-                  }
-              }
-          }
-        }
-      }
-
-
-     /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-     Phonon Sector
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
-
-     /*The Retarded Part*/
-
-         	for (i=j+1; i<n; i++){
-
+          for (i=1; i<n; i++){
             for (klevel=0; klevel< ktot+1; klevel++) {
-
-         	 	BarDR[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDR[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DR[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*IPh1B;
-         	 	DR[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DR[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*IPh1A;
-
-            IPh1B=IPh1A;
-         				for (l = j+1; l < i; l++)
-         				{
-         					P=P+h*SigPhR[klevel][i+1][l]*DR[klevel][l][j];
-         				}
-
-         		IPh1A=P;
-         		P=0.0;
-         	}
-        }
-
-     /*The Keldysh Part*/
-
-
-     	for (i=1; i<n ; i++){
-
-        for (klevel=0; klevel< ktot+1; klevel++) {
-
-     	  BarDK[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDK[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DK[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*(IPh2B+IPh3B);
-     		DK[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDK[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IPh2A+IPh3A);
-
-        IPh2B=IPh2A;
-        IPh3B=IPh3A;
-
-     				for (l = 1; l <= i; l++)
-            P=P+h*SigPhR[klevel][i+1][l]*DK[klevel][l][j];
-     				{
-     				}
-
-     		IPh2A=P+(h/2.0)*SigPhR[klevel][i+1][j]*DK[klevel][j][j];
-
-
-             //#pragma omp parallel private(partial_Sum) shared(total_Sum)
-             //{
-
-                   partial_Sum = 0;
-                   total_Sum = 0;
-
-             //#pragma omp for
-
-     						for (l = 1; l < j; l++)
-     						{
-     							partial_Sum = partial_Sum+h*SigPhK[klevel][i+1][l]*conjf(DR[klevel][j][l]);
-     						}
-
-
-                 //Create thread safe region.
-                 //#pragma omp critical
-                 //{
-                         //add each threads partial sum to the total sum
-                         total_Sum = partial_Sum;
-                 //}
-                 IPh3A=total_Sum+(h/2.0)*SigPhK[klevel][i+1][i+1]*conjf(DR[klevel][j][i]);
-
-                 //}
-                 partial_Sum = 0;
-                 total_Sum = 0;
-
-     		DK[klevel][j][i+1]=-conjf(DK[klevel][i+1][j]);
-     		BarDK[klevel][j][i]=conjf(BarDK[klevel][i][j]);
-
-     	}
-    }
-
-
-
-
-    /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Electronic Self Energies
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-        for (i=j+1; i<n; i++){
-          for (klevel=0; klevel< ktot+1; klevel++) {
-            for (plevel=0; plevel< ktot+1; plevel++) {
-              if (klevel+plevel<=ktot)
-              {
-              SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
-              }
-              if (klevel+plevel>ktot)
-              {
-              SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel-ktot][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
-              }
+              for (plevel=0; plevel< ktot+1; plevel++) {
+                if (klevel+plevel<=ktot)
+                {
+                    if (i>j)
+                    {
+                      SigElK[klevel][i][j]= -GR[klevel+plevel][i][j]*DR[plevel][i][j]-GK[klevel+plevel][i][j]*DK[plevel][i][j];
+                        }
+                    else{
+                      SigElK[klevel][i][j]= -conjf(GR[klevel+plevel][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel][j][i])*DK[plevel][j][i];
+                        }
+                }
+                if (klevel+plevel>ktot)
+                {
+                    if (i>j)
+                    {
+                      SigElK[klevel][i][j]= -GR[klevel+plevel-ktot][i][j]*DR[plevel][i][j]-GK[klevel+plevel-ktot][i][j]*DK[plevel][i][j];
+                        }
+                    else{
+                      SigElK[klevel][i][j]= -conjf(GR[klevel+plevel-ktot][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel-ktot][j][i])*DK[plevel][j][i];
+                        }
+                }
+          }
+         }
         }
       }
 
-        for (i=1; i<n; i++){
-          for (klevel=0; klevel< ktot+1; klevel++) {
-            for (plevel=0; plevel< ktot+1; plevel++) {
-              if (klevel+plevel<=ktot)
-              {
-                  if (i>j)
-                  {
-                    SigElK[klevel][i][j]= -GR[klevel+plevel][i][j]*DR[plevel][i][j]-GK[klevel+plevel][i][j]*DK[plevel][i][j];
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         Electron Sector
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+           /*The Retarded Part*/
+
+             	for (i=j+1; i<n; i++){
+                for (klevel=0; klevel< ktot+1; klevel++) {
+
+             	 	GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(omega[klevel],(i*h)+h,(i*h))*IEl1A;
+
+             				for (l = j+1; l < i; l++)
+             				{
+             					P=P+h*SigElR[klevel][i+1][l]*GR[klevel][l][j];
+             				}
+
+
+             		IEl1A=P;
+           		  P=0.0;
+                  }
+                }
+           /*The Keldysh Part*/
+
+                 for (i=1; i<n ; i++){
+                   for (klevel=0; klevel< ktot+1; klevel++) {
+             		 GK[klevel][i+1][j]= I*GzeroR(omega[klevel],(i*h)+h,(i*h))*GK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IEl2A+IEl3A);
+
+             				for (l = 1; l <= i; l++)
+             				{
+             					P=P+h*SigElR[klevel][i+1][l]*DK[klevel][l][j];
+             				}
+
+             		IEl2A=P+(h/2.0)*SigElR[klevel][i+1][j]*DK[klevel][j][j];
+             		P=0.0;
+
+
+                     //#pragma omp parallel private(partial_Sum) shared(total_Sum)
+                     //{
+
+                           partial_Sum = 0;
+                           total_Sum = 0;
+
+                     //#pragma omp for
+
+             						for (l = 1; l < j; l++)
+             						{
+             							partial_Sum = partial_Sum+h*SigElK[klevel][i+1][l]*conjf(GR[klevel][j][l]);
+             						}
+
+
+                         //Create thread safe region.
+                         //#pragma omp critical
+                         //{
+                                 //add each threads partial sum to the total sum
+                                 total_Sum = partial_Sum;
+                         //}
+                         IEl3A=total_Sum+(h/2.0)*SigElK[klevel][i+1][i+1]*conjf(GR[klevel][j][i+1]);
+
+                         //}
+                         partial_Sum = 0;
+                         total_Sum = 0;
+
+             		GK[klevel][j][i+1]=-conjf(GK[klevel][i+1][j]);
+               }
+             	}
+
+
+          /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            Phononic Self Energies
+          %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+              for (i=j+1; i<n; i++){
+                for (klevel=0; klevel< ktot+1; klevel++) {
+
+                    for (plevel=0; plevel< ktot+1; plevel++) {
+                      if (klevel+plevel<=ktot)
+                      {
+                        SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
                       }
-                  else{
-                    SigElK[klevel][i][j]= -conjf(GR[klevel+plevel][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel][j][i])*DK[plevel][j][i];
+                      if (klevel+plevel>ktot)
+                      {
+                        SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                       }
+                  }
+                }
               }
-              if (klevel+plevel>ktot)
-              {
-                  if (i>j)
-                  {
-                    SigElK[klevel][i][j]= -GR[klevel+plevel-ktot][i][j]*DR[plevel][i][j]-GK[klevel+plevel-ktot][i][j]*DK[plevel][i][j];
-                      }
-                  else{
-                    SigElK[klevel][i][j]= -conjf(GR[klevel+plevel-ktot][j][i])*DR[plevel][j][i]-conjf(GK[klevel+plevel-ktot][j][i])*DK[plevel][j][i];
-                      }
+
+              for (i=1; i<n; i++){
+                for (klevel=0; klevel< ktot+1; klevel++) {
+                  for (plevel=0; plevel< ktot+1; plevel++) {
+                    if (klevel+plevel<=ktot)
+                    {
+                        if (i>j)
+                        {
+                          SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+                        }
+                        else{
+                          SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+                        }
+                    }
+                    if (klevel+plevel>ktot)
+                    {
+                        if (i>j)
+                        {
+                          SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[plevel][i][j]) ;
+                          }
+                        else{
+                          SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[klevel][i][j]) ;
+                        }
+                    }
+                }
               }
-        }
-       }
-      }
+            }
+
+
+
+
+
+
     }
-  }
-   for (i = 0; i < n; i++){
-   printf("%f\t%f\t%f\n", i*h , -cimagf(DK[0][i][i]), cimagf(GK[0][i][i]) )  ;
-   }
+     for (i = 0; i < n; i++){
+     printf("%f\t%f\t%f\n", i*h , -cimagf(DK[0][i][i]), cimagf(GK[0][i][i]) )  ;
+     }
 
 
 }
