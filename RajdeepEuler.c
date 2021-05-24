@@ -35,10 +35,17 @@ double complex DKthermal;
 double complex I1A[2510];
 double complex I1B[2510];
 
-double complex I2[2510][2510];
-double complex I3[2510][2510];
+double complex I2A[2510];
+double complex I2B[2510];
 
-//double complex I1A, I1B, I2A, I2B, I3A, I3B;
+double complex I3A[2510];
+double complex I3B[2510];
+
+
+double complex I2[2510];
+double complex I3[2510];
+
+double complex I4A, I4B, I5A, I5B;
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -194,15 +201,18 @@ for (i=1; i<n; i++){
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
     for (j=0; j<i; j++){
-    BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(I3[i-1][j]+I2[i-1][j]);
-		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I3[i][j]+I2[i][j]);
+    BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(I3B[j]+I2B[j]);
+		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I3A[j]+I2A[j]);
+
+    I3B[j]=I3A[j];
+    I2B[j]=I2A[j];
 
 				for (l = 1; l <= i; l++)
 				{
 					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DK[l][j];
 				}
 
-		I3[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
+		I3A[j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
 		P=0.0;
 
               partial_Sum = 0;
@@ -213,7 +223,8 @@ for (i=1; i<n; i++){
               P = P + h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
 						}
 
-            I2[i+1][j]= P + (h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
+     I2A[j]= P + (h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
+
             P=0;
 
 		DK[j][i+1]=-conjf(DK[i+1][j]);
@@ -224,15 +235,15 @@ for (i=1; i<n; i++){
   for (k=1; k<=i; k++)
 
   {
-  BarDK[k][i] = -2.0*BarDzeroR(omega,(k*h),(k*h)-h)*BarDK[k-1][i]+2.0*omega*omega*DzeroR(omega,(k*h),(k*h)-h)*DK[k-1][i]+(h/2.0)*BarDzeroR(omega,(k*h),(k*h)-h)*(I3[k-1][i]+I2[k-1][i]);
-  DK[k+1][i]= -2.0*DzeroR(omega,(k*h)+h,(k*h))*BarDK[k][i]-2.0*BarDzeroR(omega,(k*h)+h,(k*h))*DK[k][i]+(h/2.0)*DzeroR(omega,(k*h)+h,(k*h))*(I3[k][i]+I2[k][i]);
+  BarDK[k][i] = -2.0*BarDzeroR(omega,(k*h),(k*h)-h)*BarDK[k-1][i]+2.0*omega*omega*DzeroR(omega,(k*h),(k*h)-h)*DK[k-1][i]+(h/2.0)*BarDzeroR(omega,(k*h),(k*h)-h)*(I3[k-1]+I2[k-1]);
+  DK[k+1][i]= -2.0*DzeroR(omega,(k*h)+h,(k*h))*BarDK[k][i]-2.0*BarDzeroR(omega,(k*h)+h,(k*h))*DK[k][i]+(h/2.0)*DzeroR(omega,(k*h)+h,(k*h))*(I3[k]+I2[k]);
 
       for (l = 1; l <= k; l++)
       {
         P=P+h*lambda*lambda*SigmaR((k*h)+h,(h*l))*DK[l][i];
       }
 
-      I3[k+1][i]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[k+1][i];
+      I3[k+1]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[k+1][i];
 
       P=0.0;
 
@@ -242,75 +253,12 @@ for (i=1; i<n; i++){
           }
 
 
-          I2[k+1][i]=P+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
+      I2[k+1]=P+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
 
       P=0.0;
   }
 }
 
-
-
-
-
-
-/*The Occupation Number*/
-/*
-		for (i=0; i<n ; i++){
-		N[i]=0.5*(-2*omega*cimagf(DK[i][i])-1);
-		}
-
-
-
-/*The Statistics*/
-/*
-double VarE[n], EE[n], E[n], Ntot[n];-2*omega*Dawson(omega/(sqrt(2)*sigma))/sqrt(3.14159265)
-double EEPr, EPr, NPr;
-
-EPr=0.0;
-EEPr=0.0;
-NPr=0.0;
-
-, cimagf(DR[0][i][0])
-
-
-		for ( t = a; t <=b ; t=t+h) {-2*omega*Dawson(omega/(sqrt(2)*sigma))/sqrt(3.14159265)
-		for ( k = 0; k <ktot ; k=k+1) {
-					NPr=NPr+N[k][i];
-				}
-				Ntot[i]=NPr;
-				NPr=0.0;
-			}
-
-
-			for ( t = a; t <=b ; t=t+h) {
-			for ( k = 0; k <ktot ; k=k+1) {
-				K=((-3.1418/A)+k*(6.2836/A)/(ktot-1));
-				omega=-2*2*cos(K);
-				EPr=EPr+(omega)*N[k][i];
-					}
-					E[i]=EPr;
-					EPr=0.0;
-				}
-
-			for ( t = a; t DzeroR(<=b ; t=t+h) {
-			for ( k = 0; k <ktot ; k=k+1) {
-						EEPr=EEPr+(omega)*(omega)*N[k][i];
-						}
-						EE[i]=EEPr;
-						EEPr=0.0;
-				}
-
-			for ( t = a+h; t <=b ; t=t+h) {
-				printf("%f\t%f\n", t, (E[i]/Ntot[i]) );
-			}
-
-
-//}
-
-*/
-/*	for (i=0; i<n ; i++){
-			 printf("%f\t%f\n", t, DK[0][i][i] );
-		 }
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 K loop ends here.
