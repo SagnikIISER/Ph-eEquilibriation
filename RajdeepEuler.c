@@ -187,17 +187,12 @@ for (i=1; i<n; i++){
     		I1A[j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
     		P=0.0;
     	}
-    	}
-
-
-
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*The Keldysh Part*/
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-    for (i=1; i<n; i++){
     for (j=0; j<i; j++){
     BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(I3[i-1][j]+I2[i-1][j]);
 		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I3[i][j]+I2[i][j]);
@@ -251,7 +246,7 @@ for (i=1; i<n; i++){
 
       P=0.0;
   }
-	}
+}
 
 
 
