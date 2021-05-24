@@ -32,11 +32,13 @@ double complex DK[2510][2510];
 double complex BarDK[2510][2510];
 double complex DKthermal;
 
-double complex I1[2510][2510];
+double complex I1A[2510];
+double complex I1B[2510];
+
 double complex I2[2510][2510];
 double complex I3[2510][2510];
 
-double complex I1A, I1B, I2A, I2B, I3A, I3B;
+//double complex I1A, I1B, I2A, I2B, I3A, I3B;
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -173,15 +175,16 @@ The Retarded Part
 
 for (i=1; i<n; i++){
     	for (j=1; j<i; j++){
-    	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*I1[i-1][j];
-    	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*I1[i][j];
+    	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*I1B[j];
+    	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*I1A[j];
 
+        I1B[j]=I1A[j];
     				for (l = j+1; l < i; l++)
     				{
     					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DR[l][j];
     				}
 
-    		I1[i+1][j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
+    		I1A[j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
     		P=0.0;
     	}
     	}
@@ -212,10 +215,10 @@ for (i=1; i<n; i++){
 
 						for (l = 1; l < j; l++)
 						{
+              P = P + h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
 						}
 
             I2[i+1][j]= P + (h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
-            P = P + h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
             P=0;
 
 		DK[j][i+1]=-conjf(DK[i+1][j]);
