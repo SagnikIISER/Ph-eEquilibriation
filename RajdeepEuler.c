@@ -221,32 +221,16 @@ for (i=1; i<n; i++){
 		I3[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
 		P=0.0;
 
-
-        //#pragma omp parallel private(partial_Sum) shared(total_Sum)
-        //{
-
               partial_Sum = 0;
               total_Sum = 0;
 
-        //#pragma omp for
-
 						for (l = 1; l < j; l++)
 						{
-							partial_Sum = partial_Sum+h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
 						}
 
-
-            //Create thread safe region.
-            //#pragma omp critical
-            //{
-                    //add each threads partial sum to the total sum
-                    total_Sum = partial_Sum;
-            //}
-            I2[i+1][j]=total_Sum+(h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
-
-            //}
-            partial_Sum = 0;
-            total_Sum = 0;
+            I2[i+1][j]= P + (h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
+            P = P + h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
+            P=0;
 
 		DK[j][i+1]=-conjf(DK[i+1][j]);
 		BarDK[j][i]=conjf(BarDK[i][j]);
@@ -264,36 +248,19 @@ for (i=1; i<n; i++){
         P=P+h*lambda*lambda*SigmaR((k*h)+h,(h*l))*DK[l][i];
       }
 
-  I3[k+1][i]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[k+1][i];
-  P=0.0;
+      I3[k+1][i]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[k+1][i];
 
-
-      //#pragma omp parallel private(partial_Sum) shared(total_Sum)
-      //{
-
-            partial_Sum = 0;
-            total_Sum = 0;
-
-      //#pragma omp for
+      P=0.0;
 
           for (l = 1; l < i; l++)
           {
-            partial_Sum = partial_Sum+h*lambda*lambda*SigK[k+1][l]*conjf(DR[i][l]);
+            P = P + h*lambda*lambda*SigK[k+1][l]*conjf(DR[i][l]);
           }
 
 
-          //Create thread safe region.
-          //#pragma omp critical
-          //{
-                  //add each threads partial sum to the total sum
-                  total_Sum = partial_Sum;
-          //}
-          I2[k+1][i]=total_Sum+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
+          I2[k+1][i]=P+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
 
-          //}
-          partial_Sum = 0;
-          total_Sum = 0;
-
+          P=0.0;
   }
 	}
 
