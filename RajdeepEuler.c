@@ -2,7 +2,7 @@
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 CODE for SOLVING DYSON EQUATION
 
-First note down all the relevant formula plus diagram
+FI1st note down all the relevant formula plus diagram
 Only true unknown in the whole buisness is the D and BarD
 There are two modules written for the Retarded and Keldysh Component:
 			a. Euler
@@ -26,19 +26,17 @@ DR, BarDR and the integration I
 
 double complex DR[2510][2510];
 double complex BarDR[2510][2510];
-double complex IR[2510][2510];
 
 double complex SigK[2510][2510];
-double complex DA[2510][2510];
-
 double complex DK[2510][2510];
 double complex BarDK[2510][2510];
 double complex DKthermal;
 
-double complex IK1[2510][2510];
-double complex IK2[2510][2510];
+double complex I1[2510][2510];
+double complex I2[2510][2510];
+double complex I3[2510][2510];
 
-
+double complex I1A, I1B, I2A, I2B, I3A, I3B;
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -58,6 +56,7 @@ int    n, klevel, ktot;				/*Array Dimension*/
 double K;					/*Momentum Formula*/
 double omega;					/*Initial Energy Level*/
 double lambda;					/*Perturbation Strength*/
+double nomega;          /*Density of states*/
 
 double sigma, Tbath, Tsyst;
 
@@ -70,19 +69,19 @@ double complex P;
 /*Working around the input variable calls*/
 
   a= 0.000000;					/*Read value of a*/
-  b= 250.000000;				 /*Read value of b*/
-  h= 0.100000;					/*Read value of h*/
+  b= 25.000000;				 /*Read value of b*/
+  h= 0.050000;					/*Read value of h*/
 
-  lambda=0.50000;				/*Read value of lambda*/
+  lambda=1.00000;				/*Read value of lambda*/
   n=(int)((b-a)/h)+1;			    	/*array Dimension*/
   ktot= 19;					/*array Dimension*/
 
-  A=1;						/*Read value of Lattice Constant*/
-  klevel=1; 			    		/*Dummy Array for momentum*/
+  A= 1.0;						/*Read value of Lattice Constant*/
+  klevel= 0; 			    		/*Dummy Array for momentum*/
 
-  sigma=5.000000;
+  sigma=10.000000;
   Tsyst=1.000000;
-  Tbath=0.800000;
+  Tbath=1.200000;
 
 int i;
 int j;
@@ -93,9 +92,8 @@ int l;
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 The Module for Dyson Iteration using Euler Method:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
-//for (klevel=0; klevel<ktot; klevel=klevel+1){
+/*
+for (klevel=0; klevel<ktot/2; klevel=klevel+1){
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Momentum values at Dummy Indicies
@@ -108,15 +106,15 @@ System Dispersion Relation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
  omega=2.0*sqrt(sin((K*A/2.0))*sin((K*A/2.0)));
-
+ nomega= 1/(exp(omega/Tsyst)-1);
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  To Plot the Dispersion Relation
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+/*
+printf("%d\t%f\t%f\t%f\n", klevel, K, omega, nomega );
 
-//printf("%f\t%f\n", K, omega );
-
-
+}
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Computing the DK thermal
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -166,8 +164,6 @@ Initial Condition
 
 for (i=0; i<n; i++){
 
-
-IR[i][i]=0;
 DR[i][i]=0;
 
 BarDR[i][i]= -1/2.0;
@@ -176,17 +172,11 @@ DK[i][i]=-(I/(2.0*omega))*(1.0/(tanh((omega)/(2*Tsyst))));
 BarDK[i][i]= 0;
 
 DR[i+1][i]= -2.0*DzeroR(omega,t+h,t)*BarDR[i][i];
-IR[i+1][i]= +1.0/(2.0*sqrt(3.14159265))*lambda*lambda*sigma*DR[i+1][i];
-
 
 DK[i+1][i]= -2.0*BarDzeroR(omega,(h*i)+h,(h*i))*DK[i][i];
 DK[i][i+1]=-conjf(DK[i+1][i]);
 
 
-IK1[i][i]=0;
-IK2[i][i]=0;
-IK1[i+1][i]=(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][i];
-IK2[i+1][i]=(h/2.0)*lambda*lambda*SigK[i+1][i+1]*DR[i+1][i];
 }
 
 
@@ -195,18 +185,17 @@ The Retarded Part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-
-    	for (j=0; j<n; j++){
-    	for (i=j+1; i<n; i++){
-    	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*IR[i-1][j];
-    	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*IR[i][j];
+for (i=1; i<n; i++){
+    	for (j=1; j<i; j++){
+    	 	BarDR[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDR[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DR[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*I1[i-1][j];
+    	 	DR[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDR[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DR[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*I1[i][j];
 
     				for (l = j+1; l < i; l++)
     				{
     					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DR[l][j];
     				}
 
-    		IR[i+1][j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
+    		I1[i+1][j]=P+(1.0/(2.0*(sqrt(3.14159265))))*lambda*lambda*sigma*DR[i+1][j];
     		P=0.0;
     	}
     	}
@@ -215,34 +204,21 @@ The Retarded Part
 
 
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The Advanced Part
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
-
-for (j=1; j<n ; j++){
-for (i=0; i<n ; i++){
-		DA[j][i]=conjf(DR[i][j]);
-}
-}
-
-
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 /*The Keldysh Part*/
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-
-	for (j=1; j<n ; j++){
-	for (i=1; i<n ; i++){
-	  BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(IK1[i-1][j]+IK2[i-1][j]);
-		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(IK1[i][j]+IK2[i][j]);
+    for (i=1; i<n; i++){
+    for (j=0; j<i; j++){
+    BarDK[i][j] = -2.0*BarDzeroR(omega,(i*h),(i*h)-h)*BarDK[i-1][j]+2.0*omega*omega*DzeroR(omega,(i*h),(i*h)-h)*DK[i-1][j]+(h/2.0)*BarDzeroR(omega,(i*h),(i*h)-h)*(I3[i-1][j]+I2[i-1][j]);
+		DK[i+1][j]= -2.0*DzeroR(omega,(i*h)+h,(i*h))*BarDK[i][j]-2.0*BarDzeroR(omega,(i*h)+h,(i*h))*DK[i][j]+(h/2.0)*DzeroR(omega,(i*h)+h,(i*h))*(I3[i][j]+I2[i][j]);
 
 				for (l = 1; l <= i; l++)
 				{
 					P=P+h*lambda*lambda*SigmaR((i*h)+h,(h*l))*DK[l][j];
 				}
 
-		IK1[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
+		I3[i+1][j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h)+h,(j*h))*DK[j][j]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[i+1][j];
 		P=0.0;
 
 
@@ -256,7 +232,7 @@ for (i=0; i<n ; i++){
 
 						for (l = 1; l < j; l++)
 						{
-							partial_Sum = partial_Sum+h*lambda*lambda*SigK[i+1][l]*DA[l][j];
+							partial_Sum = partial_Sum+h*lambda*lambda*SigK[i+1][l]*conjf(DR[j][l]);
 						}
 
 
@@ -266,7 +242,7 @@ for (i=0; i<n ; i++){
                     //add each threads partial sum to the total sum
                     total_Sum = partial_Sum;
             //}
-            IK2[i+1][j]=total_Sum+(h/2.0)*lambda*lambda*SigK[i+1][i+1]*DA[i+1][j];
+            I2[i+1][j]=total_Sum+(h/2.0)*lambda*lambda*SigK[i+1][i+1]*conjf(DR[j][i+1]);
 
             //}
             partial_Sum = 0;
@@ -276,6 +252,49 @@ for (i=0; i<n ; i++){
 		BarDK[j][i]=conjf(BarDK[i][j]);
 
 	}
+
+  for (k=1; k<=i; k++)
+
+  {
+  BarDK[k][i] = -2.0*BarDzeroR(omega,(k*h),(k*h)-h)*BarDK[k-1][i]+2.0*omega*omega*DzeroR(omega,(k*h),(k*h)-h)*DK[k-1][i]+(h/2.0)*BarDzeroR(omega,(k*h),(k*h)-h)*(I3[k-1][i]+I2[k-1][i]);
+  DK[k+1][i]= -2.0*DzeroR(omega,(k*h)+h,(k*h))*BarDK[k][i]-2.0*BarDzeroR(omega,(k*h)+h,(k*h))*DK[k][i]+(h/2.0)*DzeroR(omega,(k*h)+h,(k*h))*(I3[k][i]+I2[k][i]);
+
+      for (l = 1; l <= k; l++)
+      {
+        P=P+h*lambda*lambda*SigmaR((k*h)+h,(h*l))*DK[l][i];
+      }
+
+  I3[k+1][i]=P+(h/2.0)*lambda*lambda*SigmaR((k*h)+h,(i*h))*DK[i][i]+(1.0/(2.0*sqrt(3.14159265)))*lambda*lambda*sigma*DK[k+1][i];
+  P=0.0;
+
+
+      //#pragma omp parallel private(partial_Sum) shared(total_Sum)
+      //{
+
+            partial_Sum = 0;
+            total_Sum = 0;
+
+      //#pragma omp for
+
+          for (l = 1; l < i; l++)
+          {
+            partial_Sum = partial_Sum+h*lambda*lambda*SigK[k+1][l]*conjf(DR[i][l]);
+          }
+
+
+          //Create thread safe region.
+          //#pragma omp critical
+          //{
+                  //add each threads partial sum to the total sum
+                  total_Sum = partial_Sum;
+          //}
+          I2[k+1][i]=total_Sum+(h/2.0)*lambda*lambda*SigK[k+1][k+1]*conjf(DR[i][k+1]);
+
+          //}
+          partial_Sum = 0;
+          total_Sum = 0;
+
+  }
 	}
 
 
@@ -350,6 +369,7 @@ Put K independent printf statements after this.
 
 
 for (i = 0; i < n; i++){
-printf("%f\t%f\n", i*h , -cimagf(DK[i][i]))  ;
+printf("%f\t%f\t%f\n", i*h , crealf(DR[i][12]), -cimagf(DK[i][i]))  ;
 }
+
 }
