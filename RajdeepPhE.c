@@ -28,24 +28,24 @@ Greens Functions, Self Energies and Increments
 Electron Sector
 **************************/
 
-double complex GR[2][1010][1010];
-double complex GK[2][1010][1010];
-double complex SigElR[2][1010][1010];
-double complex SigElK[2][1010][1010];
+double complex GR[6][1010][1010];
+double complex GK[6][1010][1010];
+double complex SigElR[6][1010][1010];
+double complex SigElK[6][1010][1010];
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%
 Phonon Sector
 **************************/
 
-double complex DR[2][1010][1010];
-double complex BarDR[2][1010][1010];
+double complex DR[6][1010][1010];
+double complex BarDR[6][1010][1010];
 
-double complex DK[2][1010][1010];
-double complex BarDK[2][1010][1010];
+double complex DK[6][1010][1010];
+double complex BarDK[6][1010][1010];
 
-double complex SigPhR[2][1010][1010];
-double complex SigPhK[2][1010][1010];
+double complex SigPhR[6][1010][1010];
+double complex SigPhK[6][1010][1010];
 
 
 double complex GKtt1[30];
@@ -113,7 +113,7 @@ double main() {
 
   /*Phononic Lattice Parameters*/
 
-      ktot= 1;					           /*Phononic Lattice Dimension*/
+      ktot= 5;					           /*Phononic Lattice Dimension*/
       A=1;						             /*Read value of Phononic Lattice Constant*/
   //  klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
 
@@ -122,7 +122,7 @@ double main() {
   /*Reading the Initial Temp*/
       Tphonon=  1.000000;
       Telectron=1.000000;
-      nu = -1.0000;
+      nu = 1.0000;
 
   /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Energy Levels
@@ -196,11 +196,9 @@ double main() {
        Phonon Sector
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-
-
        /*The Retarded Part*/
 
-       for (klevel=0; klevel<= ktot; klevel++) {
+       for (klevel=0; klevel< ktot+1; klevel++) {
             for (j=1; j<i; j++){
            	 	BarDR[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDR[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DR[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*IPh1B[j];
            	 	DR[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DR[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*IPh1A[j];
@@ -219,7 +217,7 @@ double main() {
        /*The Keldysh Part*/
 
 
-
+   for (klevel=0; klevel< ktot+1; klevel++) {
         for (j=1; j<i; j++){
 
        	  BarDK[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDK[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DK[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*(IPh2B[j]+IPh3B[j]);
@@ -279,16 +277,15 @@ double main() {
 
             P=0.0;
         }
-
+        }
 
 
       /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         Electronic Self Energies
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
+      for (j=0; j<i; j++){
             for (klevel=0; klevel< ktot+1; klevel++) {
               for (plevel=0; plevel< ktot+1; plevel++) {
-                for (j=1; j<i; j++){
                 if (klevel+plevel<=ktot)
                 {
                 SigElR[klevel][i][j]= SigElR[klevel][i][j]+I*GR[klevel+plevel][i][j]*DK[plevel][i][j]+I*GK[klevel+plevel][i][j]*DR[plevel][i][j];
@@ -300,7 +297,7 @@ double main() {
           }
         }
 
-          for (j=1; j<n; j++){
+      for (j=0; j<n; j++){
             for (klevel=0; klevel< ktot+1; klevel++) {
               for (plevel=0; plevel< ktot+1; plevel++) {
                 if (klevel+plevel<=ktot)
@@ -334,7 +331,7 @@ double main() {
 
            /*The Retarded Part*/
 
-            for (klevel=0; klevel< ktot+1; klevel++) {
+            for (klevel=0; klevel< ktot; klevel++) {
               for (j=1; j<i; j++){
 
              	 	GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(omega[klevel],(i*h)+h,(i*h))*IEl1A[j];
@@ -351,7 +348,7 @@ double main() {
                 }
            /*The Keldysh Part*/
 
-           for (klevel=0; klevel< ktot+1; klevel++) {
+           for (klevel=0; klevel< ktot; klevel++) {
                  for (j=1; j<i; j++){
              		 GK[klevel][i+1][j]= I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GK[klevel][i][j]+(h/2.0)*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*(IEl2A[j]+IEl3A[j]);
 
@@ -407,14 +404,14 @@ double main() {
           %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
-          for (klevel=0; klevel< ktot+1; klevel++) {
-                    for (plevel=0; plevel< ktot+1; plevel++) {
-                      for (j=1; j<=i; j++){
-                      if (klevel+plevel<=ktot)
+          for (j=0; j<i; j++){
+          for (klevel=0; klevel< ktot; klevel++) {
+                    for (plevel=0; plevel< ktot; plevel++) {
+                      if (klevel+plevel<ktot)
                       {
                         SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
                       }
-                      if (klevel+plevel>ktot)
+                      if (klevel+plevel>=ktot)
                       {
                         SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                       }
@@ -422,41 +419,45 @@ double main() {
                 }
               }
 
-                for (klevel=0; klevel< ktot+1; klevel++) {
-                  for (plevel=0; plevel< ktot+1; plevel++) {
-                    for (j=1; j<n; i++){
-                    if (klevel+plevel<=ktot)
-                    {
-                        if (i>j)
-                        {
-                          SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+
+
+
+                      for (j=0; j<n; j++){
+                          for (klevel=0; klevel< ktot+1; klevel++) {
+                            for (plevel=0; plevel< ktot+1; plevel++) {
+                              if (klevel+plevel<=ktot)
+                              {
+                                  if (i>j)
+                                  {
+                            SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+                                      }
+                                  else{
+                                    SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
+                                  }
+                              }
+                              if (klevel+plevel>ktot)
+                              {
+                                  if (i>j)
+                                  {
+                                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[plevel][i][j]) ;
+                                    }
+                                  else{
+                                    SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[klevel][i][j]) ;
+                                  }
+                              }
                         }
-                        else{
-                          SigPhK[klevel][i][j]= GR[klevel][i][j]*conjf(GR[klevel][i][j])+GK[klevel+plevel][i][j]*conjf(GK[plevel][i][j]) ;
-                        }
-                    }
-                    if (klevel+plevel>ktot)
-                    {
-                        if (i>j)
-                        {
-                          SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[plevel][i][j]) ;
-                          }
-                        else{
-                          SigPhK[klevel][i][j]= GR[klevel+plevel-ktot][j][i]*conjf(GR[plevel][j][i])+GK[klevel+plevel-ktot][i][j]*conjf(GK[klevel][i][j]) ;
-                        }
-                    }
-                }
-              }
-            }
+                       }
+                      }
+
+
+        }
 
 
 
 
 
-
-    }
      for (i = 0; i < n; i++){
-     printf("%f\t%f\t%f\n", i*h , -cimagf(DK[0][i][i]), cimagf(GK[0][i][i]) )  ;
+     printf("%f\t%f\t%f\n", i*h , -cimagf(DK[1][i][i]), cimagf(GK[1][i][i]) )  ;
      }
 
 
