@@ -285,7 +285,7 @@ double main() {
         Electronic Self Energies
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-          for (i=j+1; i<n; i++){
+          for (j=0; j<i; j++){
             for (klevel=0; klevel< ktot+1; klevel++) {
               for (plevel=0; plevel< ktot+1; plevel++) {
                 if (klevel+plevel<=ktot)
@@ -299,7 +299,7 @@ double main() {
           }
         }
 
-          for (i=1; i<n; i++){
+          for (j=1; j<n; j++){
             for (klevel=0; klevel< ktot+1; klevel++) {
               for (plevel=0; plevel< ktot+1; plevel++) {
                 if (klevel+plevel<=ktot)
