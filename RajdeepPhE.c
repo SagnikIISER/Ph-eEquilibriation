@@ -189,7 +189,7 @@ double main() {
   Dyson Iteration
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
-  for (i=0; i<n; i++){
+  for (i=1; i<n; i++){
 
 
        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -408,11 +408,11 @@ double main() {
                     for (j=1; j<i; j++){
                     for (klevel=0; klevel< ktot+1; klevel++) {
                               for (plevel=0; plevel< ktot+1; plevel++) {
-                                if (klevel+plevel<ktot)
+                                if (klevel+plevel<=ktot)
                                 {
                                   SigPhR[klevel][i][j]=  -crealf(I*GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
                                 }
-                                if (klevel+plevel>=ktot)
+                                if (klevel+plevel>ktot)
                                 {
                                   SigPhR[klevel][i][j]= -crealf(I*GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                                 }
@@ -459,9 +459,10 @@ double main() {
 
 
 
-     for (i = 0; i < n; i++){
-       printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , cimagf(GK[0][i][i]), cimagf(GK[1][i][i]), cimagf(GK[2][i][i]), -cimagf(DK[3][i][i]), -cimagf(DK[4][i][i]), -cimagf(DK[5][i][i]) )  ;
-     }
+
+             for (i = 0; i < n; i++){
+               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , cimagf(GK[0][i][i]), cimagf(GK[1][i][i]), cimagf(GK[2][i][i]), -cimagf(DK[3][i][i]), -cimagf(DK[4][i][i]), -cimagf(DK[5][i][i]) )  ;
+             }
 
 
 }
