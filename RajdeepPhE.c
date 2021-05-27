@@ -392,10 +392,10 @@ double main() {
 
              				for (l = 1; l <= i; l++)
              				{
-             					P=P+h*SigElR[klevel][i+1][l]*DK[klevel][l][j];
+             					P=P+h*SigElR[klevel][i+1][l]*GK[klevel][l][j];
              				}
 
-             		IEl2A[j]=P+(h/2.0)*SigElR[klevel][i+1][j]*DK[klevel][j][j];
+             		IEl2A[j]=P+(h/2.0)*SigElR[klevel][i+1][j]*GK[klevel][j][j];
              		P=0.0;
 
 
@@ -418,10 +418,10 @@ double main() {
 
                    for (l = 1; l <= k; l++)
                    {
-                     P=P+h*SigElR[klevel][k+1][l]*DK[klevel][l][i];
+                     P=P+h*SigElR[klevel][k+1][l]*GK[klevel][l][i];
                    }
 
-               IEl2B[k+1]=P+(h/2.0)*SigElR[klevel][k+1][i]*DK[klevel][i][i];
+               IEl2B[k+1]=P+(h/2.0)*SigElR[klevel][k+1][i]*GK[klevel][i][i];
                P=0.0;
 
 
