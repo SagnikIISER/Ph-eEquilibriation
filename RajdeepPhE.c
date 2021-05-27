@@ -80,12 +80,10 @@ double main() {
 
     double a,b; 					         /*to be used for lower and upper bound on time*/
     double h;					             /*time increment*/
-
     double A;					             /*Lattice Constant*/
     int    n, klevel, ktot;				 /*Array Dimension*/
     int    plevel;		        		 /*Array Dimension*/
     double K;					             /*Momentum Formula*/
-  //  double omega, epsilon;			 /*Initial Phononic, Electronic Energy Levels respectively*/
     double lambda;					       /*Perturbation Strength*/
 
     double Tphonon, Telectron;     /*Phonon and Electron Temp*/
@@ -111,7 +109,7 @@ double main() {
 
   /*Phononic Lattice Parameters*/
 
-      ktot= 5;					           /*Phononic Lattice Dimension*/
+      ktot= 1;					           /*Phononic Lattice Dimension*/
       A=1;						             /*Read value of Phononic Lattice Constant*/
   //  klevel=1; 			    		     /*Dummy Array for Phononic momentum*/
 
@@ -240,8 +238,6 @@ double main() {
        						}
 
                    IPh3A[j]=total_Sum+(h/2.0)*SigPhK[klevel][i+1][i+1]*conjf(DR[klevel][j][i]);
-
-
                    P = 0;
 
        		DK[klevel][j][i+1]=-conjf(DK[klevel][i+1][j]);
@@ -327,7 +323,7 @@ double main() {
                                                    P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[plevel][j][i]*conjf(GR[klevel+plevel-ktot][j][i])); ;
                                               }
                                         }
-                                        SigElK[klevel][i][j]=P;
+                                        SigElK[klevel][i][j]=-P;
                                         P=0;
                                        }
                                       }
@@ -358,7 +354,7 @@ double main() {
                                                    P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[plevel][i][k]*conjf(GR[klevel+plevel-ktot][i][k])); ;
                                               }
                                         }
-                                        SigElK[klevel][k][i]=P;
+                                        SigElK[klevel][k][i]=-P;
                                         P=0;
                                        }
                                       }
@@ -370,10 +366,10 @@ double main() {
            /*The Retarded Part*/
 
             for (klevel=0; klevel< ktot+1; klevel++) {
-              for (j=0; j<i; j++){
+              for (j=1; j<i; j++){
 
-             	 	GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(omega[klevel],(i*h)+h,(i*h))*IEl1A[j];
 
+                GR[klevel][i+1][j]= -I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*IEl1A[j];
              				for (l = j+1; l < i; l++)
              				{
              					P=P+h*SigElR[klevel][i+1][l]*GR[klevel][l][j];
@@ -454,7 +450,7 @@ double main() {
                                   P = P-lambda*lambda*I*(GR[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                                 }
                             }
-                            SigPhR[klevel][i][j]=P;
+                            SigPhR[klevel][i][j]=-P;
                             P=0;
                           }
                         }
@@ -526,7 +522,7 @@ double main() {
 
 
              for (i = 0; i < n; i++){
-               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , cimagf(GK[0][i][i]), cimagf(GK[1][i][i]), cimagf(GK[2][i][i]), -cimagf(DK[3][i][i]), -cimagf(DK[4][i][i]), -cimagf(DK[5][i][i]) )  ;
+               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , cimagf(GK[0][i][i]), cimagf(GK[1][i][i]), cimagf(GK[2][i][i]), -cimagf(DK[0][i][i]), -cimagf(DK[1][i][i]), -cimagf(DK[5][i][i]) )  ;
              }
 
 
