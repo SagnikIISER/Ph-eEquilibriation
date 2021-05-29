@@ -32,20 +32,7 @@ double complex GK[2510][2510];
 double complex BarGK[2510][2510];
 double complex DKthermal;
 
-double complex I1A[2510];
-double complex I1B[2510];
-
-double complex I2A[2510];
-double complex I2B[2510];
-
-double complex I3A[2510];
-double complex I3B[2510];
-
-
-double complex I2[2510];
-double complex I3[2510];
-
-double complex I4A, I4B, I5A, I5B;
+double complex I4, I5;
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Main Module
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
@@ -181,10 +168,10 @@ for (i=0; i<n; i++){
           P=P+h*lambda*lambda*SigmaR((i*h),(h*l))*GR[l][j];
         }
 
-        I1A[j]=P;
+        I4=P;
         P=0.0;
 
-        GR[i+1][j]= I*GzeroR(epsilon,(i*h)+h,(i*h))*GR[i][j]+(h/2.0)*GzeroR(epsilon,(i*h)+h,(i*h))*I1A[j];
+        GR[i+1][j]= I*GzeroR(epsilon,(i*h)+h,(i*h))*GR[i][j]+(h/2.0)*GzeroR(epsilon,(i*h)+h,(i*h))*I4;
 
     	}
 
@@ -199,7 +186,7 @@ for (i=0; i<n; i++){
         P=P+h*lambda*lambda*SigmaR((i*h),(h*l))*GK[l][j];
       }
 
-      I3A[j]=P+(h/2.0)*lambda*lambda*SigmaR((i*h),(j*h))*GK[j][j];;
+      I4=P+(h/2.0)*lambda*lambda*SigmaR((i*h),(j*h))*GK[j][j];;
       P=0.0;
 
           for (l = 1; l < j; l++)
@@ -207,10 +194,10 @@ for (i=0; i<n; i++){
             P = P + h*lambda*lambda*SigK[i][l]*conjf(GR[j][l]);
           }
 
-      I2A[j]= P + (h/2.0)*lambda*lambda*SigK[i][i]*conjf(GR[j][i]);
+      I5= P + (h/2.0)*lambda*lambda*SigK[i][i]*conjf(GR[j][i]);
       P=0;
 
-      GK[i+1][j]= I*GzeroR(epsilon,(i*h)+h,(i*h))*GK[i][j]+(h/2.0)*GzeroR(epsilon,(i*h)+h,(i*h))*(I2A[j]+I3A[j]);
+      GK[i+1][j]= I*GzeroR(epsilon,(i*h)+h,(i*h))*GK[i][j]+(h/2.0)*GzeroR(epsilon,(i*h)+h,(i*h))*(I4+I5);
 		  GK[j][i+1]=-conjf(GK[i+1][j]);
 		}
 
@@ -222,7 +209,7 @@ for (i=0; i<n; i++){
       P=P+h*lambda*lambda*SigmaR((k*h),(h*l))*GK[l][i];
     }
 
-    I3[k]=P+(h/2.0)*lambda*lambda*SigmaR((k*h),(i*h))*GK[i][i];
+    I4=P+(h/2.0)*lambda*lambda*SigmaR((k*h),(i*h))*GK[i][i];
     P=0.0;
 
         for (l = 1; l < i; l++)
@@ -231,10 +218,10 @@ for (i=0; i<n; i++){
         }
 
 
-    I2[k]=P+(h/2.0)*lambda*lambda*SigK[k][k]*conjf(GR[i][k]);
+    I5=P+(h/2.0)*lambda*lambda*SigK[k][k]*conjf(GR[i][k]);
     P=0.0;
 
-    GK[k+1][i]= I*GzeroR(epsilon,(k*h)+h,(k*h))*GK[k][i]+(h/2.0)*GzeroR(epsilon,(k*h)+h,(k*h))*(I2[k]+I3[k]);
+    GK[k+1][i]= I*GzeroR(epsilon,(k*h)+h,(k*h))*GK[k][i]+(h/2.0)*GzeroR(epsilon,(k*h)+h,(k*h))*(I4+I5);
 
 
   }
