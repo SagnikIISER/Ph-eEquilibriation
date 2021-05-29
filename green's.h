@@ -109,7 +109,7 @@ Phononic Bare Green's Functions
        double complex GzeroK(double omega, double Tsyst, double nu, double t, double tprime) {
 
         		double complex G;
-              	G = (I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)));
+              	G =-(I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)));
               	return G;
            	}
 
@@ -133,39 +133,19 @@ for the Test Module
               double complex D;
               double sigma;
 
-              sigma = 10.0;
+              sigma = 2.0;
 
-              if (t<tprime) {
+              if (t<=tprime) {
                   D=0;
                 }
          		  else{
-                D= -(1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(t-tprime)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
+                //D= -(1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(t-tprime)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
+                D = (2*I/(3.14159265*sigma))*j1(-2.0*sigma*(t-tprime))/(t-tprime);
               }
 
               return D;
          	}
 
-/*********************************
-   Function call for SigmaRP
-*********************************/
-
-    double complex SigmaRP( double t, double tprime) {
-
-
-             double complex D;
-             double sigma;
-
-             sigma = 10.0;
-
-             if (t<tprime) {
-             D=0;
-             }
-        		  else{
-                D = (1.0/(2.0*sqrt(3.14159265)))*sigma*sigma*sigma*(sigma*sigma*(t-tprime)*(t-tprime)/2.0-1.0)*exp(-sigma*sigma*(t-tprime)*(t-tprime)/4.0);
-            }
-
-            return D;
-        }
 
 
 /*********************************
@@ -176,17 +156,18 @@ for the Test Module
 
 
                                  double complex D,P;
-                                 double sigma,Tbath;
+                                 double sigma,Tbath, nu;
                                  double akka;
                                  double h;
 
                                  h=0.02;
                                  P=0.0;
-                                 sigma = 10.0;
-                                 Tbath = 1.2;
+                                 sigma = 2.0;
+                                 Tbath = 1.0;
+                                 nu = -0.5;
 
-                                 for(akka=-40.0; akka <= 40.0; akka=akka+h){
-                                 P = P+ h*(-2.0*I*akka*exp(-(akka*akka)/(sigma*sigma)))*(1.0/tanh((akka/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
+                                 for(akka=-2.0*sigma; akka <= 2.0*sigma; akka=akka+h){
+                                 P = P+ h*(I*(2.0/sigma)*sqrt(1-(akka*akka)/(4*sigma*sigma)))*(tanh(((akka-nu)/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
                                  }
                                  D = P/(2.0*3.14159265);
                                  P = 0.0;
