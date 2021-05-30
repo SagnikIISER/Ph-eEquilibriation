@@ -64,7 +64,7 @@ double complex P;
 /*Working around the input variable calls*/
 
   a= 0.000000;					/*Read value of a*/
-  b= 25.000000;				 /*Read value of b*/
+  b= 50.000000;				 /*Read value of b*/
   h= 0.050000;					/*Read value of h*/
 
   lambda=1.00000;				/*Read value of lambda*/
@@ -74,8 +74,8 @@ double complex P;
   A= 1.0;						/*Read value of Lattice Constant*/
   klevel= 0; 			    		/*Dummy Array for momentum*/
 
-  Telectron=1.000000;
-  nu=-1.0;
+  Telectron=0.000000;
+  nu=1.0;
 
 int i;
 int j;
@@ -146,12 +146,12 @@ for (i=0; i<n; i++){
 
 
             GR[i][i]= I;
-            GK[i][i]= I*tanh((epsilon-nu)/(2.0*Telectron));
+            GK[i][i]= -I*tanh((epsilon-nu)/(2.0*Telectron));
 
             GR[i+1][i]= GzeroR(epsilon,(i*h)+h,(i*h));
 
             GK[i+1][i]= GzeroK(epsilon,Telectron,nu,(i*h)+h,(i*h));
-            GK[i][i+1]= conjf(GK[i+1][i]);
+            GK[i][i+1]= -conjf(GK[i+1][i]);
 
 }
 
@@ -214,14 +214,14 @@ for (i=0; i<n; i++){
 
         for (l = 1; l < i; l++)
         {
-          P = P + h*lambda*lambda*SigK[k][l]*conjf(GR[i][l]);
+          P = P + h*lambda*lambda*SigK[k][l]*conjf(GR[i+1][l]);
         }
 
 
-    I5=P+(h/2.0)*lambda*lambda*SigK[k][k]*conjf(GR[i][k]);
+    I5=P+(h/2.0)*lambda*lambda*SigK[k][k]*conjf(GR[i+1][k]);
     P=0.0;
 
-    GK[k+1][i]= I*GzeroR(epsilon,(k*h)+h,(k*h))*GK[k][i]+(h/2.0)*GzeroR(epsilon,(k*h)+h,(k*h))*(I4+I5);
+    GK[k+1][i+1]= I*GzeroR(epsilon,(k*h)+h,(k*h))*GK[k][i]+(h/2.0)*GzeroR(epsilon,(k*h)+h,(k*h))*(I4+I5);
 
 
   }
@@ -236,7 +236,7 @@ Put K independent printf statements after this.
 
 
 for (i = 0; i < n; i++){
-printf("%f\t%f\t%f\n", i*h , crealf(GR[i][12]), cimagf(GK[i][i]))  ;
+printf("%f\t%f\t%f\n", i*h , crealf(GR[i][12]), 0.5*(cimagf(GK[i][i])+1))  ;
 }
 
 }
