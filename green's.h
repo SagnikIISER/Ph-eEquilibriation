@@ -163,11 +163,11 @@ for the Test Module
                                  h=0.02;
                                  P=0.0;
                                  sigma = 2.0;
-                                 Tbath = 1.0;
-                                 nu = -0.5;
+                                 Tbath = 0.0;
+                                 nu = -5.0;
 
                                  for(akka=-2.0*sigma; akka <= 2.0*sigma; akka=akka+h){
-                                 P = P+ h*(I*(2.0/sigma)*sqrt(1-(akka*akka)/(4*sigma*sigma)))*(tanh(((akka-nu)/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
+                                 P = P+ -h*((2.0/sigma)*sqrt(1-(akka*akka)/(4*sigma*sigma)))*(tanh(((akka-nu)/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
                                  }
                                  D = P/(2.0*3.14159265);
                                  P = 0.0;
