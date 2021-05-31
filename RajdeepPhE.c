@@ -260,6 +260,92 @@ double main() {
                       }
                     }
 
+  /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  The Phonons
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        The Retarded Part
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+        for (klevel=0; klevel< ktot+1; klevel++) {
+      	for (j=1; j<i; j++){
+            for (l = j+1; l < i; l++)
+                {
+                  P=P+h*SigPhR[klevel][i][l]*DR[klevel][l][j];
+                }
+
+                IPh1A[j]=P;
+                P=0.0;
+
+            BarDR[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDR[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DR[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*IPh1B[j];
+            DR[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DR[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*IPh1A[j];
+
+            IPh1B[j]=IPh1A[j];
+
+                }
+              }
+
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+        /*The Keldysh Part*/
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+        for (klevel=0; klevel< ktot+1; klevel++) {
+        for (j=0; j<i; j++){
+            for (l = 1; l <= i; l++)
+                {
+                  P=P+h*SigPhR[klevel][i][l]*DK[klevel][l][j];
+                }
+
+             IPh3A[j]=P+(h/2.0)*SigPhR[klevel][i][j]*DK[klevel][j][j];
+             P=0.0;
+
+             for (l = 1; l < j; l++)
+                 {
+                   P = P + h*SigPhK[klevel][i][l]*conjf(DR[klevel][j][l]);
+                 }
+
+             IPh2A[j]= P + (h/2.0)*SigPhK[klevel][i][i]*conjf(DR[klevel][j][i]);
+             P=0;
+
+             BarDK[klevel][i][j] = -2.0*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*BarDK[klevel][i-1][j]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(i*h),(i*h)-h)*DK[klevel][i-1][j]+(h/2.0)*BarDzeroR(omega[klevel],(i*h),(i*h)-h)*(IPh3B[j]+IPh2B[j]);
+             DK[klevel][i+1][j]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDK[klevel][i][j]-2.0*BarDzeroR(omega[klevel],(i*h)+h,(i*h))*DK[klevel][i][j]+(h/2.0)*DzeroR(omega[klevel],(i*h)+h,(i*h))*(IPh3A[j]+IPh2A[j]);
+
+             IPh3B[j]=IPh3A[j];
+             IPh2B[j]=IPh2A[j];
+
+
+             DK[klevel][j][i+1]=-conjf(DK[klevel][i+1][j]);
+             BarDK[klevel][j][i]=conjf(BarDK[klevel][i][j]);
+
+             }
+            }
+
+        for (klevel=0; klevel< ktot+1; klevel++) {
+        for (k=1; k<=i; k++){
+             for (l = 1; l <= k; l++)
+                {
+                  P=P+h*SigPhR[klevel][k][l]*DK[klevel][l][i];
+                  }
+
+             I3[k+1]=P+(h/2.0)*SigPhR[klevel][i][i]*DK[klevel][i][i];
+             P=0.0;
+
+             for (l = 1; l < i; l++)
+                {
+                P = P + h*SigPhK[klevel][k][l]*conjf(DR[klevel][i][l]);
+                }
+
+
+            I2[k+1]=P+(h/2.0)*SigPhK[klevel][k][k]*conjf(DR[klevel][i][k]);
+            P=0.0;
+
+            BarDK[klevel][k][i] = -2.0*BarDzeroR(omega[klevel],(k*h),(k*h)-h)*BarDK[klevel][k-1][i]+2.0*omega[klevel]*omega[klevel]*DzeroR(omega[klevel],(k*h),(k*h)-h)*DK[klevel][k-1][i]+(h/2.0)*BarDzeroR(omega[klevel],(k*h),(k*h)-h)*(I3[k-1]+I2[k-1]);
+            DK[klevel][k+1][i]= -2.0*DzeroR(omega[klevel],(k*h)+h,(k*h))*BarDK[klevel][k][i]-2.0*BarDzeroR(omega[klevel],(k*h)+h,(k*h))*DK[klevel][k][i]+(h/2.0)*DzeroR(omega[klevel],(k*h)+h,(k*h))*(I3[k]+I2[k]);
+            }
+          }
+
 
     /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       Electronic Self Energies
@@ -340,7 +426,13 @@ double main() {
                             }
 
 
-        }
+
+
+
+
+
+
+             }
 
 
              for (i = 0; i < n; i++){
