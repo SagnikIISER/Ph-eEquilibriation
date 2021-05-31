@@ -236,7 +236,7 @@ Put K independent printf statements after this.
 
 
 for (i = 0; i < n; i++){
-printf("%f\t%f\t%f\n", i*h , crealf(GR[i][12]), 0.5*(cimagf(GK[i][i])+1))  ;
+printf("%f\t%f\t%f\n", i*h , 0.5*(crealf(GK[i][i])+1), 0.5*(sqrt(cimagf(GK[i][i])*cimagf(GK[i][i])-crealf(GK[i][i])*crealf(GK[i][i]))+1) )  ;
 }
 
 }
