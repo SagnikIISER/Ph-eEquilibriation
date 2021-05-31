@@ -148,16 +148,15 @@ double main() {
   for (i=0; i<n; i++){
   for (klevel=0; klevel< ktot+1; klevel++) {
 
-    /*Electronic Sector*/
+  /*Electronic Sector*/
 
-          GR[klevel][i][i]= -I;
-          GK[klevel][i][i]= I*tanh((epsilon[klevel]-nu)/(2.0*Telectron));
+  GR[klevel][i][i]= I;
+  GK[klevel][i][i]= -I*tanh((epsilon[klevel]-nu)/(2.0*Telectron));
 
-          GR[klevel][i+1][i]= GzeroR(epsilon[klevel],(i*h)+h,(i*h));
+  GR[klevel][i+1][i]= GzeroR(epsilon[klevel],(i*h)+h,(i*h));
 
-          GK[klevel][i+1][i]= GzeroK(epsilon[klevel],Telectron,nu,(i*h)+h,(i*h));
-          GK[klevel][i][i+1]=-conjf(GK[klevel][i+1][i]);
-
+  GK[klevel][i+1][i]= GzeroK(epsilon[klevel],Telectron,nu,(i*h)+h,(i*h));
+  GK[klevel][i][i+1]= -conjf(GK[klevel][i+1][i]);
 
   /*Phononic Sector*/
 
@@ -167,10 +166,10 @@ double main() {
   DK[klevel][i][i]=-(I/(2.0*omega[klevel]))*(1.0/(tanh((omega[klevel])/(2*Tphonon))));
   BarDK[klevel][i][i]= 0;
 
-  DR[klevel][i+1][i]= -2.0*DzeroR(omega[klevel],t+h,t)*BarDR[klevel][i][i];
+  DR[klevel][i+1][i]= -2.0*DzeroR(omega[klevel],(i*h)+h,(i*h))*BarDR[klevel][i][i];
 
   DK[klevel][i+1][i]= -2.0*BarDzeroR(omega[klevel],(h*i)+h,(h*i))*DK[klevel][i][i];
-  DK[klevel][i][i+1]=-conjf([klevel]DK[i+1][i]);
+  DK[klevel][i][i+1]=-conjf(DK[klevel][i+1][i]);
 
     }
   }
@@ -224,7 +223,7 @@ double main() {
                        P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                           }
                   else{
-                       P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel-ktot][i][j])); 
+                       P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel-ktot][i][j]));
                           }
                         }
                         }
@@ -238,7 +237,7 @@ double main() {
             for (klevel=0; klevel< ktot+1; klevel++) {
             for (plevel=0; plevel< ktot+1; plevel++) {
 
-              if (klevel+plevel<=ktot{
+              if (klevel+plevel<=ktot){
                   if (k>i){
                       P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
                           }
@@ -317,7 +316,7 @@ double main() {
                     for (klevel=0; klevel< ktot+1; klevel++) {
                     for (plevel=0; plevel< ktot+1; plevel++) {
 
-                        if (klevel+plevel<=ktot{
+                        if (klevel+plevel<=ktot){
                             if (k>i){
                               P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
                                     }
@@ -339,16 +338,6 @@ double main() {
                         P=0;
                                 }
                             }
-
-
-
-
-
-
-
-
-
-
 
 
         }
