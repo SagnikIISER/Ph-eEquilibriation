@@ -65,7 +65,7 @@ double Beta[1010];
 double Nu[1010];
 
 double complex IPh1A[1010], IPh1B[1010], IPh2A[1010], IPh2B[1010], IPh3A[1010], IPh3B[1010], I2[1010], I3[1010];
-double complex IEl1A[1010], IEl1B[1010], IEl2A[1010], IEl2B[1010], IEl3A[1010], IEl3B[1010];
+double complex I4,I5;
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,9 +114,9 @@ double main() {
 
 
   /*Reading the Initial Temp*/
-      Tphonon=  1.000000;
-      Telectron=1.000000;
-      nu = -1.0000;
+      Tphonon=  0.500000;
+      Telectron=0.500000;
+      nu = 0.0;
 
   /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Energy Levels
@@ -227,7 +227,7 @@ double main() {
                           }
                         }
                         }
-               SigPhK[klevel][i][j]=P;
+               SigPhK[klevel][i][j]=P*(-I);
                P=0;
                  }
               }
@@ -255,7 +255,7 @@ double main() {
                         }
                         }
 
-              SigPhK[klevel][k][i]=P;
+              SigPhK[klevel][k][i]=P*(-I);
               P=0;
                       }
                     }
@@ -392,7 +392,7 @@ double main() {
                                   }
                                 }
                                 }
-                        SigElK[klevel][i][j]=P;
+                        SigElK[klevel][i][j]=P*(-I);
                         P=0;
                            }
                         }
@@ -420,23 +420,101 @@ double main() {
                                 }
                                 }
 
-                        SigElK[klevel][k][i]=P;
+                        SigElK[klevel][k][i]=P*(-I);
                         P=0;
                                 }
                             }
 
 
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  The Electrons
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+         The Retarded Part
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
+          for (klevel=0; klevel< ktot+1; klevel++) {
+          for (j=1; j<i; j++){
+             for (l = j+1; l < i; l++)
+                {
+                 P=P+h*SigElR[klevel][i][l]*GR[klevel][l][j];
+                }
 
+             I4=P;
+             P=0.0;
 
+           GR[klevel][i+1][j]= I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GR[klevel][i][j]+(h/2.0)*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*I4;
 
+               }
              }
 
 
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+        /*The Keldysh Part*/
+        /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+          for (klevel=0; klevel< ktot+1; klevel++) {
+          for (j=0; j<i; j++){
+              for (l = 1; l <= i; l++)
+                {
+                P=P+h*SigElR[klevel][i][l]*GK[klevel][l][j];
+                }
+
+          I4=P+(h/2.0)*SigElR[klevel][i][j]*GK[klevel][j][j];;
+          P=0.0;
+
+                for (l = 1; l < j; l++)
+                {
+                P = P + h*SigElK[klevel][i][l]*conjf(GR[klevel][j][l]);
+                }
+
+          I5= P + (h/2.0)*SigElK[klevel][i][i]*conjf(GR[klevel][j][i]);
+          P=0;
+
+          GK[klevel][i+1][j]= I*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*GK[klevel][i][j]+(h/2.0)*GzeroR(epsilon[klevel],(i*h)+h,(i*h))*(I4+I5);
+          GK[klevel][j][i+1]=-conjf(GK[klevel][i+1][j]);
+                }
+              }
+
+
+
+          for (klevel=0; klevel< ktot+1; klevel++) {
+          for (k=0; k<=i; k++){
+               for (l = 1; l <= k; l++)
+                {
+                P=P+h*SigElR[klevel][k][l]*GK[klevel][l][i];
+                }
+
+          I4=P+(h/2.0)*SigElR[klevel][k][i]*GK[klevel][i][i];
+          P=0.0;
+
+               for (l = 1; l < i; l++)
+                {
+                P = P + h*SigElK[klevel][k][l]*conjf(GR[klevel][i+1][l]);
+                }
+
+
+          I5=P+(h/2.0)*SigElK[klevel][k][k]*conjf(GR[klevel][i+1][k]);
+          P=0.0;
+
+          GK[klevel][k+1][i+1]= I*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*GK[klevel][k][i]+(h/2.0)*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*(I4+I5);
+
+
+          }
+        }
+
+
+ }
+
+ /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ K loop ends here.
+ Put K independent printf statements after this.
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
              for (i = 0; i < n; i++){
-               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , crealf(GR[0][i][2]), cimagf(GR[0][i][2]), crealf(DK[0][i][i]), cimagf(DK[1][i][i]), crealf(DR[0][i][2]), cimagf(DR[0][i][2]) )  ;
+               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , crealf(GR[1][i][2]), cimagf(GR[1][i][2]), crealf(GK[1][i][i]), cimagf(GK[1][i][i]), crealf(DR[1][i][2]), cimagf(DR[1][i][2]), crealf(DK[1][i][2]), cimagf(DK[1][i][2]) )  ;
              }
 
 
