@@ -99,7 +99,7 @@ double main() {
   /*Working around the input variable calls*/
 
       a= 0.000000;					       /*Read value of a*/
-      b= 50.000000;				       /*Read value of b*/
+      b= 50.000000;				         /*Read value of b*/
       h= 0.100000;					       /*Read value of h*/
 
       lambda=1.00000;				       /*Read value of lambda*/
@@ -193,11 +193,11 @@ double main() {
 
               if (klevel+plevel<=ktot)
                  {
-                   P = P-lambda*lambda*I*(GR[klevel+plevel][i][j]*GK[plevel][j][i]+GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
+                   P = P+lambda*lambda*(GR[klevel+plevel][i][j]*GK[plevel][j][i]+GK[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
                    }
               if (klevel+plevel>ktot)
                  {
-                    P = P-lambda*lambda*I*(GR[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
+                    P = P+lambda*lambda*(GR[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GK[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                    }
                    }
               SigPhR[klevel][i][j]=-P;
@@ -212,50 +212,50 @@ double main() {
 
                if (klevel+plevel<=ktot){
                   if (i>j){
-                       P = P-lambda*lambda*I*(GK[klevel+plevel][i][j]*GK[plevel][j][i]+GR[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
+                       P = P+lambda*lambda*(GK[klevel+plevel][i][j]*GK[plevel][j][i]+GR[klevel+plevel][i][j]*conjf(GR[plevel][i][j]));
                            }
                   else{
-                       P = P-lambda*lambda*I*(GK[klevel+plevel][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel][i][j]));
+                       P = P+lambda*lambda*(GK[klevel+plevel][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel][i][j]));
                            }
                         }
                if (klevel+plevel>ktot){
                   if (i>j){
-                       P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
+                       P = P+lambda*lambda*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[klevel+plevel-ktot][i][j]*conjf(GR[plevel][i][j]));
                           }
                   else{
-                       P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel-ktot][i][j]));
+                       P = P+lambda*lambda*(GK[klevel+plevel-ktot][i][j]*GK[plevel][j][i]+GR[plevel][i][j]*conjf(GR[klevel+plevel-ktot][i][j]));
                           }
                         }
                         }
-               SigPhK[klevel][i][j]=P*(-I);
+               SigPhK[klevel][i][j]=P;
                P=0;
                  }
               }
 
 
-         for (k=1; k<=i; k++){
+         for (k=1; k<i; k++){
             for (klevel=0; klevel< ktot+1; klevel++) {
             for (plevel=0; plevel< ktot+1; plevel++) {
 
               if (klevel+plevel<=ktot){
                   if (k>i){
-                      P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
+                      P = P+lambda*lambda*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
                           }
                   else{
-                      P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel][k][i]));
+                      P = P+lambda*lambda*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel][k][i]));
                           }
                       }
               if (klevel+plevel>ktot) {
                   if (k>i){
-                      P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[klevel+plevel-ktot][k][i]*conjf(GR[plevel][k][i]));
+                      P = P+lambda*lambda*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[klevel+plevel-ktot][k][i]*conjf(GR[plevel][k][i]));
                           }
                   else{
-                      P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel-ktot][k][i]));
+                      P = P+lambda*lambda*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel-ktot][k][i]));
                           }
                         }
                         }
 
-              SigPhK[klevel][k][i]=P*(-I);
+              SigPhK[klevel][k][i]=P;
               P=0;
                       }
                     }
@@ -358,11 +358,11 @@ double main() {
 
                       if (klevel+plevel<=ktot)
                          {
-                         P = P-lambda*lambda*I*(GR[klevel+plevel][i][j]*DK[plevel][j][i]+GK[klevel+plevel][i][j]*conjf(DR[plevel][i][j]));
+                         P = P+lambda*lambda*(GR[klevel+plevel][i][j]*DK[plevel][j][i]+GK[klevel+plevel][i][j]*conjf(DR[plevel][i][j]));
                          }
                      if (klevel+plevel>ktot)
                          {
-                         P = P-lambda*lambda*I*(GR[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GK[klevel+plevel-ktot][i][j]*conjf(DR[plevel][i][j]));
+                         P = P+lambda*lambda*(GR[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GK[klevel+plevel-ktot][i][j]*conjf(DR[plevel][i][j]));
                          }
                        }
                      SigElR[klevel][i][j]=-P;
@@ -377,22 +377,22 @@ double main() {
 
                        if (klevel+plevel<=ktot){
                           if (i>j){
-                               P = P-lambda*lambda*I*(GK[klevel+plevel][i][j]*DK[plevel][j][i]+GR[klevel+plevel][i][j]*conjf(DR[plevel][i][j]));
+                               P = P+lambda*lambda*(GK[klevel+plevel][i][j]*DK[plevel][j][i]+GR[klevel+plevel][i][j]*conjf(DR[plevel][i][j]));
                                   }
                          else{
-                               P = P-lambda*lambda*I*(GK[klevel+plevel][i][j]*DK[plevel][j][i]+GR[plevel][i][j]*conjf(DR[klevel+plevel][i][j]));
+                               P = P+lambda*lambda*(GK[klevel+plevel][i][j]*DK[plevel][j][i]+GR[plevel][i][j]*conjf(DR[klevel+plevel][i][j]));
                                   }
                               }
                        if (klevel+plevel>ktot){
                            if (i>j){
-                               P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GR[klevel+plevel-ktot][i][j]*conjf(DR[plevel][i][j]));
+                               P = P+lambda*lambda*(GK[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GR[klevel+plevel-ktot][i][j]*conjf(DR[plevel][i][j]));
                                   }
                            else{
-                               P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GR[plevel][i][j]*conjf(DR[klevel+plevel-ktot][i][j]));
+                               P = P+lambda*lambda*(GK[klevel+plevel-ktot][i][j]*DK[plevel][j][i]+GR[plevel][i][j]*conjf(DR[klevel+plevel-ktot][i][j]));
                                   }
                                 }
                                 }
-                        SigElK[klevel][i][j]=P*(-I);
+                        SigElK[klevel][i][j]=P;
                         P=0;
                            }
                         }
@@ -404,23 +404,23 @@ double main() {
 
                         if (klevel+plevel<=ktot){
                             if (k>i){
-                              P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
+                              P = P+lambda*lambda*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[klevel+plevel][k][i]*conjf(GR[plevel][k][i]));
                                     }
                             else{
-                              P = P-lambda*lambda*I*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel][k][i]));
+                              P = P+lambda*lambda*(GK[klevel+plevel][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel][k][i]));
                                     }
                               }
                         if (klevel+plevel>ktot) {
                             if (k>i){
-                              P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[klevel+plevel-ktot][k][i]*conjf(GR[plevel][k][i]));
+                              P = P+lambda*lambda*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[klevel+plevel-ktot][k][i]*conjf(GR[plevel][k][i]));
                                     }
                             else{
-                              P = P-lambda*lambda*I*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel-ktot][k][i]));
+                              P = P+lambda*lambda*(GK[klevel+plevel-ktot][k][i]*GK[plevel][i][k]+GR[plevel][k][i]*conjf(GR[klevel+plevel-ktot][k][i]));
                                     }
                                 }
                                 }
 
-                        SigElK[klevel][k][i]=P*(-I);
+                        SigElK[klevel][k][i]=P;
                         P=0;
                                 }
                             }
@@ -484,7 +484,7 @@ double main() {
           for (k=0; k<=i; k++){
                for (l = 1; l <= k; l++)
                 {
-                P=P+h*SigElR[klevel][k][l]*GK[klevel][l][i];
+                P=P+h*SigElR[klevel][k][l]*GK[klevel][l][i+1];
                 }
 
           I4=P+(h/2.0)*SigElR[klevel][k][i]*GK[klevel][i][i];
@@ -499,7 +499,7 @@ double main() {
           I5=P+(h/2.0)*SigElK[klevel][k][k]*conjf(GR[klevel][i+1][k]);
           P=0.0;
 
-          GK[klevel][k+1][i+1]= I*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*GK[klevel][k][i]+(h/2.0)*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*(I4+I5);
+          GK[klevel][k+1][i+1]= I*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*GK[klevel][k][i+1]+(h/2.0)*GzeroR(epsilon[klevel],(k*h)+h,(k*h))*(I4+I5);
 
 
           }
@@ -514,7 +514,7 @@ double main() {
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
              for (i = 0; i < n; i++){
-               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , crealf(GR[1][i][2]), cimagf(GR[1][i][2]), crealf(GK[1][i][i]), cimagf(GK[1][i][i]), crealf(DR[1][i][2]), cimagf(DR[1][i][2]), crealf(DK[1][i][2]), cimagf(DK[1][i][2]) )  ;
+               printf("%f\t%f\t%f\n", i*h , crealf(GR[0][i][3]),  crealf(DR[0][i][3]) )  ;
              }
 
 
