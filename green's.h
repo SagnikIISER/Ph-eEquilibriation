@@ -109,7 +109,7 @@ Phononic Bare Green's Functions
        double complex GzeroK(double omega, double Tsyst, double nu, double t, double tprime) {
 
         		double complex G;
-              	G =-(I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)));
+              	G =(I*cos(omega*(t-tprime))+sin(omega*(t-tprime)))*(tanh((omega-nu)/(2.0*Tsyst)));
               	return G;
            	}
 
@@ -164,12 +164,12 @@ for the Test Module
                                  P=0.0;
                                  sigma = 2.0;
                                  Tbath = 0.0;
-                                 nu = -5.0;
+                                 nu = 0.5;
 
                                  for(akka=-2.0*sigma; akka <= 2.0*sigma; akka=akka+h){
-                                 P = P+ -h*((2.0/sigma)*sqrt(1-(akka*akka)/(4*sigma*sigma)))*(tanh(((akka-nu)/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
+                                 P = P+ I*h*((2.0/sigma)*sqrt(1-(akka*akka)/(4*sigma*sigma)))*(tanh(((akka-nu)/(2.0*Tbath))))*((cos(akka*(t-tprime)))-I*sin(akka*(t-tprime)));
                                  }
-                                 D = P/(2.0*3.14159265);
+                                 D = P/(3.14159265*3.14159265);
                                  P = 0.0;
 
              return D;
