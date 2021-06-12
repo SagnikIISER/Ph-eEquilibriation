@@ -542,7 +542,7 @@ double main() {
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
              for (i = 0; i < n; i++){
-               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , crealf(GR[0][i][3]),  crealf(DR[0][i][3]), cimagf(GK[0][i][i]),  cimagf(DK[0][i][i]), cimagf(GK[1][i][i]),  cimagf(DK[1][i][i]) )  ;
+               printf("%f\t%f\t%f\t%f\t%f\t%f\t%f\n", i*h , crealf(GR[0][i][3]),  crealf(DR[0][i][3]), crealf(GK[0][i][i]),  crealf(DK[0][i][i]), crealf(GK[1][i][i]),  crealf(DK[1][i][i]) )  ;
              }
 
 
