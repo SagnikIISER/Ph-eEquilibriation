@@ -77,36 +77,10 @@ int k;
 int l;
 
 
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The Module for Dyson Iteration using Euler Method:
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-/*
-for (klevel=0; klevel<ktot/2; klevel=klevel+1){
-
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Momentum values at Dummy Indicies
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
- K=((-1/A)+klevel*(2/A)/(ktot-1.0));
-
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-System Dispersion Relation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-
- epsilon = 0.0;
- //nomega= 1/(exp(omega/Tsyst)-1);
-
-
-/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- To Plot the Dispersion Relation
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-/*
-printf("%d\t%f\t%f\t%f\n", klevel, K, omega, nomega );
-}
 
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Assigning Sigma K
+ Assigning Sigma K
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 	for (i=0; i<n; i++){
@@ -129,6 +103,15 @@ Assigning Sigma K
         SigK[j][i]=SigK[0][i-j];
     }
   }
+
+
+/*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ Energy Level:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+ epsilon = 0.0;
+
+
 
 /*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Initial Condition
